@@ -1,4 +1,4 @@
-project(spatial_primitives)
+project(ransac_primitives)
 
 set(CMAKE_CXX_FLAGS "-O4 -g -Wall -fPIC -std=c++0x")
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
