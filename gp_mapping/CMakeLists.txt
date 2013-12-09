@@ -1,4 +1,4 @@
-project(gp_compressor)
+project(gp_mapping)
 
 set(CMAKE_CXX_FLAGS "-O4 -g -fPIC -std=c++0x")
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
