@@ -1,4 +1,4 @@
-gp_compressor
+gp_mapping
 =============
 
-Gaussian processes compression of point clouds
+A mapping framework for registration and map building using Gaussian processes.
