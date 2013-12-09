@@ -9,7 +9,7 @@
 #include <pcl/features/normal_3d.h>
 #include <pcl/filters/passthrough.h>
 
-#define PRINTOUTS true
+#define PRINTOUTS false
 
 using namespace Eigen;
 
