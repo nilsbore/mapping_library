@@ -11,6 +11,7 @@ struct primitive_params
     int min_shape;
     int inlier_min;
     double connectedness_res;
+    double distance_threshold;
     primitive_params(const primitive_params& other)
     {
         octree_res = other.octree_res;
@@ -21,6 +22,7 @@ struct primitive_params
         min_shape = other.min_shape;
         inlier_min = other.inlier_min;
         connectedness_res = other.connectedness_res;
+        distance_threshold = other.distance_threshold;
     }
 
     primitive_params()
@@ -33,6 +35,7 @@ struct primitive_params
         min_shape = 1000;
         inlier_min = min_shape;
         connectedness_res = 0.02;
+        distance_threshold = 2.0;
     }
 };
 

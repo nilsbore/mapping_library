@@ -27,7 +27,7 @@ primitive_extractor::primitive_extractor(pcl::PointCloud<pcl::PointXYZRGB>::Ptr 
     srand(time(NULL));
 
     // create the point cloud from the points that are close enough
-    remove_distant_points(new_cloud, 2.0);
+    remove_distant_points(new_cloud, params.distance_threshold);
 
     // initialize clouds and matrices
     octree.setInputCloud(cloud);

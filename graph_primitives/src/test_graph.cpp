@@ -15,6 +15,7 @@ int main(int argc, char** argv)
 {
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>());
     std::string dirname = "/home/nbore/catkin_ws/xtionclouds";
+    //std::string dirname = "/home/nbore/Data/pcldata/Pcd";
     std::vector<std::string> files;
     if (!convenience::read_directory(files, dirname))
     {
@@ -57,7 +58,6 @@ int main(int argc, char** argv)
     }
 
     viewer.join_thread();
-
 
     return 0;
 }
