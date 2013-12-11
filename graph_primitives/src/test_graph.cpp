@@ -27,11 +27,11 @@ int main(int argc, char** argv)
     std::vector<base_primitive*> primitives = { new plane_primitive(), new cylinder_primitive() };
     primitive_params params;
     params.octree_res = 0.2;
-    params.normal_neigbourhood = 0.03;
-    params.inlier_threshold = 0.02;
+    params.normal_neigbourhood = 0.02;
+    params.inlier_threshold = 0.01;
     params.angle_threshold = 0.3;
     params.add_threshold = 0.01;
-    params.min_shape = 1000;
+    params.min_shape = 5000;
     params.inlier_min = params.min_shape;
     params.connectedness_res = 0.01;
 
@@ -63,8 +63,12 @@ int main(int argc, char** argv)
         }
 
         graph_extractor ge(extracted, inliers, 0.1);
-        std::string graphfile = "/home/nbore/Workspace/mapping_library/graph_primitives/graphs/test3.dot";
+        std::string graphdir = "/home/nbore/Workspace/mapping_library/graph_primitives/graphs/";
+        std::string graphfile = graphdir + "test.dot";
+        std::string imagefile = graphdir + "test.png";
         ge.generate_dot_file(graphfile);
+        std::string command = "dot -Tpng " + graphfile + " > " + imagefile + " && gvfs-open " + imagefile;
+        system(command.c_str());
 
         break;
     }
