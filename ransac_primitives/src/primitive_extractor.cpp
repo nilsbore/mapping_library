@@ -325,3 +325,12 @@ double primitive_extractor::prob_candidate_not_found(double candidate_size,
     double intpart = octree.size()*tree_depth*(1 << points_required);
     return pow(1.0f - candidate_size/intpart, candidates_evaluated);
 }
+
+void primitive_extractor::primitive_inlier_points(MatrixXd& points, base_primitive* p)
+{
+    unsigned sz = p->supporting_inds.size();
+    points.resize(3, sz);
+    for (int i = 0; i < sz; ++i) {
+        points.col(i) = mpoints.col(p->supporting_inds[i]);
+    }
+}

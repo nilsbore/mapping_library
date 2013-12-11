@@ -45,6 +45,7 @@ private:
     void remove_points_from_cloud(const std::vector<int>& ind, base_primitive::shape shape);
     void add_new_primitive(base_primitive* primitive);
 public:
+    void primitive_inlier_points(Eigen::MatrixXd& points, base_primitive* p);
     void extract(std::vector<base_primitive*>& extracted);
     pcl::PointCloud<pcl::Normal>::ConstPtr get_normals();
     pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr get_cloud();

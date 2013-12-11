@@ -10,6 +10,7 @@
 #include "plane_primitive.h"
 #include "sphere_primitive.h"
 #include "cylinder_primitive.h"
+#include "graph_extractor.h"
 
 int main(int argc, char** argv)
 {
@@ -23,7 +24,7 @@ int main(int argc, char** argv)
         return 0;
     }
 
-    std::vector<base_primitive*> primitives = { new plane_primitive() };
+    std::vector<base_primitive*> primitives = { new plane_primitive(), new cylinder_primitive() };
     primitive_params params;
     params.octree_res = 0.2;
     params.normal_neigbourhood = 0.03;
@@ -47,17 +48,30 @@ int main(int argc, char** argv)
 
         std::cout << "Processing " << file << ".." << std::endl;
 
-        primitive_extractor extractor(cloud, primitives, params, &viewer);
-        viewer.cloud = extractor.get_cloud();
+        primitive_extractor pe(cloud, primitives, params, &viewer);
+        viewer.cloud = pe.get_cloud();
         viewer.cloud_changed = true;
-        viewer.cloud_normals = extractor.get_normals();
+        viewer.cloud_normals = pe.get_normals();
         viewer.normals_changed = true;
         std::vector<base_primitive*> extracted;
-        extractor.extract(extracted);
+        pe.extract(extracted);
 
+        std::vector<Eigen::MatrixXd> inliers;
+        inliers.resize(extracted.size());
+        for (int i = 0; i < extracted.size(); ++i) {
+            pe.primitive_inlier_points(inliers[i], extracted[i]);
+        }
+
+        graph_extractor ge(extracted, inliers, 0.1);
+        std::string graphfile = "/home/nbore/Workspace/mapping_library/graph_primitives/graphs/test3.dot";
+        ge.generate_dot_file(graphfile);
+
+        break;
     }
 
     viewer.join_thread();
+
+
 
     return 0;
 }
