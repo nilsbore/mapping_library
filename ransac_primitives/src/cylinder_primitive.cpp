@@ -163,7 +163,7 @@ base_primitive* cylinder_primitive::instantiate()
 
 void cylinder_primitive::draw(boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer)
 {
-    //return; // don't draw cylinders for now
+    return; // don't draw cylinders for now
     pcl::ModelCoefficients mc;
     Vector3d tc = c + min2(0)*a;
     Vector3d ta = c + max2(0)*a - tc;

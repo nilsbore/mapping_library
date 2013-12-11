@@ -42,7 +42,7 @@ private:
     double prob_candidate_not_found(double candidate_size,
                                     double candidates_evaluated,
                                     int points_required);
-    void remove_points_from_cloud(const std::vector<int>& ind, base_primitive::shape shape);
+    void remove_points_from_cloud(base_primitive* p);
     void add_new_primitive(base_primitive* primitive);
 public:
     void primitive_inlier_points(Eigen::MatrixXd& points, base_primitive* p);

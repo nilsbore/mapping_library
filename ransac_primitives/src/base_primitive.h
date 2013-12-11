@@ -11,6 +11,7 @@ public:
     // the different kinds of primitives that we are treating, only used for coloring
     enum shape {PLANE, SPHERE, CYLINDER, TORUS, CONE};
     std::vector<int> supporting_inds; // the inliers to the primitive
+    u_char red, green, blue; // colors used when displaying the primitive
     static int min_inliers; // the minimum inliers required to check connectedness, skip primitive otherwise
     static double margin; // the margin used when discarding octree nodes by looking at the primitives
     static double connectedness_res; // the resolution in the discretized image where we check for connectedness

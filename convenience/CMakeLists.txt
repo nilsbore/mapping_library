@@ -6,3 +6,4 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 # Main library
 add_library(files src/files.cpp)
+add_library(conversions src/conversions.cpp)

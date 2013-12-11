@@ -5,6 +5,40 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include "base_primitive.h"
+#include "conversions.h"
+
+class primitive_label_writer {
+public:
+    primitive_label_writer(std::vector<base_primitive*>& primitives) : primitives(primitives) {}
+    template <class VertexOrEdge>
+    void operator()(std::ostream& out, const VertexOrEdge& v) const {
+        std::string name;
+        std::string shape;
+        base_primitive* p = primitives[v];
+        switch (p->get_shape()) {
+        case base_primitive::SPHERE:
+            name = "Sphere";
+            shape = "ellipse";
+            break;
+        case base_primitive::PLANE:
+            name = "Plane";
+            shape = "box";
+            break;
+        case base_primitive::CYLINDER:
+            name = "Cylinder";
+            shape = "ellipse";
+            break;
+        default:
+            break;
+        }
+        out << "[label=\"" << name << "\"]";
+        out << "[shape=\"" << shape << "\"]";
+        out << "[style=\"filled\"]";
+        out << "[fillcolor=\"" << convenience::rgb_to_hex_string(p->red, p->green, p->blue) << "\"]";
+    }
+private:
+    std::vector<base_primitive*>& primitives;
+};
 
 class graph_extractor
 {

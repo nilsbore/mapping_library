@@ -17,12 +17,13 @@ void graph_extractor::construct_adjacency_graph(std::vector<MatrixXd>& inliers)
     v.resize(primitives.size());
     for (int i = 0; i < primitives.size(); ++i) {
         v[i] = boost::add_vertex(g);
+
     }
     double mindist;
     for (int i = 1; i < inliers.size(); ++i) {
         for (int j = 0; j < i; ++j) {
             mindist = primitive_distance(inliers[i], inliers[j]);
-            std::cout << "Min dist for " << i << " and " << j << " is " << mindist << std::endl;
+            std::cout << "Min dist for " << i << " aand " << j << " is " << mindist << std::endl;
             if (mindist < adjacency_dist) {
                 boost::add_edge(v[i], v[j], g);
             }
@@ -68,6 +69,7 @@ void graph_extractor::generate_dot_file(const std::string& filename)
             break;
         }
     }
-    boost::write_graphviz(file, g, boost::make_label_writer(name)); // dot -Tpng test2.dot > test2.png
+    primitive_label_writer writer(primitives);
+    boost::write_graphviz(file, g, writer);//boost::make_label_writer(name)); // dot -Tpng test2.dot > test2.png
     file.close();
 }

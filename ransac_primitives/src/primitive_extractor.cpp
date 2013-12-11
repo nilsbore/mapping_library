@@ -226,47 +226,57 @@ void primitive_extractor::add_new_primitive(base_primitive* primitive)
         primitive->draw(vis->viewer);
         vis->unlock();
     }
-    remove_points_from_cloud(primitive->supporting_inds, primitive->get_shape());
+    remove_points_from_cloud(primitive);
 }
 
-void primitive_extractor::remove_points_from_cloud(const std::vector<int>& inds, base_primitive::shape shape)
+void primitive_extractor::remove_points_from_cloud(base_primitive* p)
 {
-    octree.remove_points(inds); // remove points in octree that are part of shape
+    octree.remove_points(p->supporting_inds); // remove points in octree that are part of shape
 
     if (vis != NULL) {
         vis->lock();
     }
 
-    int r = rand() % 4;
-    for (const int& i : inds) {
-        cloud->points[i].r = 0;
-        cloud->points[i].g = 0;
-        cloud->points[i].b = 0;
-        /*if (shape == base_primitive::PLANE) {
-            cloud->points[i].r = 255;
-        }
-        else if (shape == base_primitive::SPHERE) {
-            cloud->points[i].g = 255;
-        }
-        else {
-            cloud->points[i].b = 255;
-        }*/
-        if (r == 0) {
-            cloud->points[i].g = 255;
-        }
-        else if (r == 1) {
-            cloud->points[i].r = 255;
-            cloud->points[i].b = 255;
-        }
-        else if (r == 2) {
-            cloud->points[i].r = 255;
-            cloud->points[i].g = 255;
-            cloud->points[i].b = 0;
-        }
-        else {
-            cloud->points[i].b = 255;
-        }
+    p->red = 0;
+    p->green = 0;
+    p->blue = 0;
 
+    int r = rand() % 5;
+    if (r == 0) {
+        p->green = 255;
+    }
+    else if (r == 1) {
+        p->red = 255;
+        p->blue = 255;
+    }
+    else if (r == 2) {
+        p->green = 255;
+        p->blue = 255;
+    }
+    else if (r == 3) {
+        p->red = 255;
+    }
+    else {
+        p->blue = 255;
+    }
+
+    /*switch (p->get_shape()) {
+    case base_primitive::PLANE:
+        p->red = 255;
+        break;
+    case base_primitive::SPHERE:
+        p->green = 255;
+        break;
+    case base_primitive::CYLINDER:
+        p->blue = 255;
+        break;
+    default:
+        break;
+    }*/
+    for (const int& i : p->supporting_inds) {
+        cloud->points[i].r = p->red;
+        cloud->points[i].g = p->green;
+        cloud->points[i].b = p->blue;
     }
 
     if (vis != NULL) {

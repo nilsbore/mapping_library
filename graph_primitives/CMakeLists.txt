@@ -29,7 +29,7 @@ add_executable(test_graph src/test_graph.cpp)
 add_executable(test_bgl src/test_bgl.cpp)
 add_executable(test_plot_bgl src/test_plot_bgl.cpp)
 
-target_link_libraries(graph_extractor primitive_extractor primitive_octree primitive_leaf primitive_visualizer
+target_link_libraries(graph_extractor conversions primitive_extractor primitive_octree primitive_leaf primitive_visualizer
 base_primitive plane_primitive sphere_primitive cylinder_primitive opencv_core opencv_imgproc opencv_highgui ${PCL_LIBRARIES})
 
 target_link_libraries(test_graph graph_extractor files primitive_extractor primitive_octree primitive_leaf primitive_visualizer
