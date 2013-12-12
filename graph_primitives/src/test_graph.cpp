@@ -28,12 +28,12 @@ int main(int argc, char** argv)
     primitive_params params;
     params.octree_res = 0.2;
     params.normal_neigbourhood = 0.02;
-    params.inlier_threshold = 0.01;
+    params.inlier_threshold = 0.005;
     params.angle_threshold = 0.3;
     params.add_threshold = 0.01;
-    params.min_shape = 5000;
+    params.min_shape = 4000;
     params.inlier_min = params.min_shape;
-    params.connectedness_res = 0.01;
+    params.connectedness_res = 0.02;
 
     primitive_visualizer viewer;
     viewer.create_thread();

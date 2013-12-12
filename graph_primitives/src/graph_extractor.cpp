@@ -37,9 +37,12 @@ double graph_extractor::primitive_distance(MatrixXd& inliers1, MatrixXd& inliers
     double mindist = INFINITY;
     MatrixXd temp;
     double mincol;
-    for (int i = 0; i < inliers1.rows(); ++i) {
+    int skip = 100;
+    for (int i = 0; i < inliers1.cols(); i += skip) {
         temp = inliers1.col(i).replicate(1, inliers2.cols());
         temp -= inliers2;
+        //MatrixXd temp2 = temp.colwise().squaredNorm();
+        //std::cout << "temp2 rows: " << temp2.rows() << ", cols: " << temp2.cols() << std::endl;
         mincol = temp.colwise().squaredNorm().minCoeff();
         if (sqrt(mincol) < mindist) {
             mindist = sqrt(mincol);
@@ -52,23 +55,6 @@ void graph_extractor::generate_dot_file(const std::string& filename)
 {
     std::ofstream file;
     file.open(filename);
-
-    char** name = new char*[primitives.size()];
-    for (int i = 0; i < primitives.size(); ++i) {
-        switch (primitives[i]->get_shape()) {
-        case base_primitive::SPHERE:
-            name[i] = "Sphere";
-            break;
-        case base_primitive::PLANE:
-            name[i] = "Plane";
-            break;
-        case base_primitive::CYLINDER:
-            name[i] = "Cylinder";
-            break;
-        default:
-            break;
-        }
-    }
     primitive_label_writer writer(primitives);
     boost::write_graphviz(file, g, writer);//boost::make_label_writer(name)); // dot -Tpng test2.dot > test2.png
     file.close();
