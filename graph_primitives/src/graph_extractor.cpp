@@ -41,8 +41,6 @@ double graph_extractor::primitive_distance(MatrixXd& inliers1, MatrixXd& inliers
     for (int i = 0; i < inliers1.cols(); i += skip) {
         temp = inliers1.col(i).replicate(1, inliers2.cols());
         temp -= inliers2;
-        //MatrixXd temp2 = temp.colwise().squaredNorm();
-        //std::cout << "temp2 rows: " << temp2.rows() << ", cols: " << temp2.cols() << std::endl;
         mincol = temp.colwise().squaredNorm().minCoeff();
         if (sqrt(mincol) < mindist) {
             mindist = sqrt(mincol);
