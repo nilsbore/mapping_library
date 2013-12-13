@@ -15,8 +15,9 @@
 int main(int argc, char** argv)
 {
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>());
-    std::string dirname = "/home/nbore/catkin_ws/xtionclouds";
+    //std::string dirname = "/home/nbore/catkin_ws/xtionclouds";
     //std::string dirname = "/home/nbore/Data/pcldata/Pcd";
+    std::string dirname = "/home/nbore/Data/Robot data/Primitives3/renamed";
     std::vector<std::string> files;
     if (!convenience::read_directory(files, dirname))
     {
@@ -24,23 +25,24 @@ int main(int argc, char** argv)
         return 0;
     }
 
-    std::vector<base_primitive*> primitives = { new plane_primitive(), new cylinder_primitive() };
+    std::vector<base_primitive*> primitives = { new plane_primitive(), new cylinder_primitive(), new sphere_primitive() };
     primitive_params params;
-    params.octree_res = 0.2;
+    params.octree_res = 0.04;
     params.normal_neigbourhood = 0.02;
-    params.inlier_threshold = 0.005;
-    params.angle_threshold = 0.3;
+    params.inlier_threshold = 0.01;
+    params.angle_threshold = 0.4;
     params.add_threshold = 0.01;
     params.min_shape = 4000;
     params.inlier_min = params.min_shape;
     params.connectedness_res = 0.02;
+    params.distance_threshold = 1.5;
 
     primitive_visualizer viewer;
     viewer.create_thread();
 
     int counter = 0;
     for (const std::string& file : files) {
-        if (counter % 10 != 0) {
+        if (counter % 20 != 0) {
             ++counter;
             continue;
         }
@@ -60,6 +62,9 @@ int main(int argc, char** argv)
         viewer.normals_changed = true;
         std::vector<base_primitive*> extracted;
         pe.extract(extracted);
+        if (extracted.empty()) {
+            continue;
+        }
 
         std::vector<Eigen::MatrixXd> inliers;
         inliers.resize(extracted.size());

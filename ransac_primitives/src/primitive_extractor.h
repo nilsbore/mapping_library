@@ -44,6 +44,7 @@ private:
                                     int points_required);
     void remove_points_from_cloud(base_primitive* p);
     void add_new_primitive(base_primitive* primitive);
+    void clear_primitives(std::vector<base_primitive*> ps);
 public:
     void primitive_inlier_points(Eigen::MatrixXd& points, base_primitive* p);
     void extract(std::vector<base_primitive*>& extracted);

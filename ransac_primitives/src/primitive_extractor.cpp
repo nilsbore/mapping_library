@@ -9,7 +9,7 @@
 #include <pcl/features/normal_3d.h>
 #include <pcl/filters/passthrough.h>
 
-#define PRINTOUTS false
+#define PRINTOUTS true
 
 using namespace Eigen;
 
@@ -45,6 +45,7 @@ primitive_extractor::primitive_extractor(pcl::PointCloud<pcl::PointXYZRGB>::Ptr 
     mnormals.resize(3, cloud->size());
 
     for (int i = 0; i < cloud->size(); ++i) {
+        //cloud->points[i].r = 255;
         mpoints.col(i) = cloud->points[i].getVector3fMap().cast<double>();
         mnormals.col(i) = cloud_normals->points[i].getNormalVector3fMap().cast<double>();
         mnormals.col(i).normalize();
@@ -109,12 +110,13 @@ void primitive_extractor::extract(std::vector<base_primitive*>& extracted)
     int n = cloud->size();
     double candidates_evaluated = 0.0;
 
+    double prob_not_found;
     std::vector<int> inds;
     int iteration = 0;
     do {
         // pick one point from entire cloud
         int ind = rand() % n; // change to work for clouds > RAND_MAX
-        if (isnan(cloud->points[ind].x)) {
+        if (isnan(cloud->points[ind].x) || isnan(cloud->points[ind].y) || isnan(cloud->points[ind].z)) {
             continue;
         }
 
@@ -209,14 +211,28 @@ void primitive_extractor::extract(std::vector<base_primitive*>& extracted)
             keep_candidates.clear();
         }
 
+        prob_not_found = prob_candidate_not_found(params.min_shape, candidates_evaluated, min_set);
+        if (std::isinf(prob_not_found)) {
+            clear_primitives(extracted);
+            break;
+        }
+
         if (PRINTOUTS) {
-            std::cout << "Prob min cand not found: " << prob_candidate_not_found(params.min_shape, candidates_evaluated, min_set) << std::endl;
+            std::cout << "Prob min cand not found: " << prob_not_found << std::endl;
         }
         ++iteration;
     }
-    while (prob_candidate_not_found(params.min_shape, candidates_evaluated, min_set) > params.add_threshold);
+    while (prob_not_found > params.add_threshold);
     // min_set because that will be the most unlikely shape
+    clear_primitives(candidates);
+}
 
+void primitive_extractor::clear_primitives(std::vector<base_primitive*> ps)
+{
+    for (base_primitive* p : ps) {
+        delete p;
+    }
+    ps.clear();
 }
 
 void primitive_extractor::add_new_primitive(base_primitive* primitive)

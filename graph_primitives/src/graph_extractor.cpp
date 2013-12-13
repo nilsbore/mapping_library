@@ -23,7 +23,7 @@ void graph_extractor::construct_adjacency_graph(std::vector<MatrixXd>& inliers)
     for (int i = 1; i < inliers.size(); ++i) {
         for (int j = 0; j < i; ++j) {
             mindist = primitive_distance(inliers[i], inliers[j]);
-            std::cout << "Min dist for " << i << " aand " << j << " is " << mindist << std::endl;
+            std::cout << "Min dist for " << i << " and " << j << " is " << mindist << std::endl;
             if (mindist < adjacency_dist) {
                 boost::add_edge(v[i], v[j], g);
             }
