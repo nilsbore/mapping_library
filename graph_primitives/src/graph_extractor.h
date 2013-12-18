@@ -15,6 +15,7 @@ public:
         std::string name;
         std::string shape;
         base_primitive* p = primitives[v];
+        std::cout << "Shape: " << p->get_shape() << std::endl;
         switch (p->get_shape()) {
         case base_primitive::SPHERE:
             name = "Sphere";

@@ -26,11 +26,11 @@ private:
     std::vector<base_primitive*>& primitives; // primitive types used
 
     primitive_params params;
-    double inlier_threshold; // distance from shape that counts as inlier
-    double angle_threshold; // highest allowed normal angle deviation
-    double add_threshold; // probability required to add shape, P(|m| | |C|) < add_threshold
-    int least_support; // stop when we're confident enough not to have overlooked a shape with least_support points
-    double normal_radius; // radius within which we'll estimate the normals of a point
+    //double inlier_threshold; // distance from shape that counts as inlier
+    //double angle_threshold; // highest allowed normal angle deviation
+    //double add_threshold; // probability required to add shape, P(|m| | |C|) < add_threshold
+    //int least_support; // stop when we're confident enough not to have overlooked a shape with least_support points
+    //double normal_radius; // radius within which we'll estimate the normals of a point
 
     primitive_visualizer* vis;
 

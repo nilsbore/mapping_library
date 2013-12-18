@@ -54,6 +54,10 @@ int main(int argc, char** argv)
         }
 
         std::cout << "Processing " << file << "..." << std::endl;
+        /*for (int i = 0; i < cloud->size(); ++i) {
+            cloud->points[i].x *= 0.4;
+            cloud->points[i].y *= 0.4;
+        }*/
 
         primitive_extractor pe(cloud, primitives, params, &viewer);
         viewer.cloud = pe.get_cloud();

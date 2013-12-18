@@ -155,6 +155,7 @@ void primitive_extractor::extract(std::vector<base_primitive*>& extracted)
             }
             else {
                 delete c;
+                c = NULL;
             }
         }
         candidates_evaluated += 1.0;
@@ -201,6 +202,7 @@ void primitive_extractor::extract(std::vector<base_primitive*>& extracted)
                     // remove candidate
                     candidates_evaluated = pow(1 - double(p->get_inliers())/double(octree.size()), 3.0)*candidates_evaluated;
                     delete p;
+                    p = NULL;
                 }
                 else {
                     // keep in new vector
