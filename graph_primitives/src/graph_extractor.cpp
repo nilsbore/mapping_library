@@ -19,13 +19,19 @@ void graph_extractor::construct_adjacency_graph(std::vector<MatrixXd>& inliers)
         v[i] = boost::add_vertex(g);
     }
     double mindist;
+    Vector3d d1;
+    Vector3d c1;
+    Vector3d d2;
+    Vector3d c2;
     for (int i = 1; i < inliers.size(); ++i) {
         for (int j = 0; j < i; ++j) {
             mindist = primitive_distance(inliers[i], inliers[j]);
             std::cout << "Min dist for " << i << " and " << j << " is " << mindist << std::endl;
             if (mindist < adjacency_dist) {
-                edge_weight_property e = 5.0;
-                boost::add_edge(v[i], v[j], e, g);
+                primitives[i]->direction_and_center(d1, c1);
+                primitives[j]->direction_and_center(d2, c2);
+                edge_weight_property e = acos(fabs(d1.dot(d2)));
+                std::pair<boost::graph_traits<graph>::edge_descriptor, bool> result = boost::add_edge(v[i], v[j], e, g);
             }
         }
     }
@@ -54,6 +60,7 @@ void graph_extractor::generate_dot_file(const std::string& filename)
     std::ofstream file;
     file.open(filename);
     primitive_label_writer writer(primitives);
-    boost::write_graphviz(file, g, writer);//boost::make_label_writer(name)); // dot -Tpng test2.dot > test2.png
+    primitive_edge_writer<graph> edge_writer(g);
+    boost::write_graphviz(file, g, writer, edge_writer);//boost::make_label_writer(name)); // dot -Tpng test2.dot > test2.png
     file.close();
 }

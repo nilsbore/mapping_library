@@ -42,6 +42,20 @@ private:
     std::vector<base_primitive*>& primitives;
 };
 
+template <class Graph>
+class primitive_edge_writer {
+public:
+    //typedef boost::property<boost::edge_weight_t, double> edge_weight_property;
+    primitive_edge_writer(Graph& g) : g(g) {}
+    //template <class VertexOrEdge>
+    void operator()(std::ostream& out, const typename boost::graph_traits<Graph>::edge_descriptor& e) const {
+        double v = boost::get(boost::edge_weight_t(), g, e);
+        out << "[label=\"" << v << "\"]";
+    }
+private:
+    Graph& g;
+};
+
 class graph_extractor
 {
 public:
