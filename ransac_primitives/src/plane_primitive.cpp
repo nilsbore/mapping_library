@@ -157,3 +157,13 @@ double plane_primitive::distance_to_pt(const Vector3d& pt)
 {
     return fabs(pt.dot(p.segment<3>(0)) + p(3));
 }
+
+void plane_primitive::direction_and_center(Eigen::Vector3d& direction, Eigen::Vector3d& center)
+{
+    direction = p.segment<3>(0);
+}
+
+double plane_primitive::shape_size()
+{
+    return 0;
+}

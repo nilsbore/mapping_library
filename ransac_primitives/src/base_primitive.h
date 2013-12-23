@@ -31,6 +31,9 @@ public:
     // check if the shape is on either side of xyz, the center of a box with side length l,
     // used for effective search for primitive inliers in an octree
     virtual double distance_to_pt(const Eigen::Vector3d& pt) = 0;
+    // used to find the relative angles between primitives
+    virtual void direction_and_center(Eigen::Vector3d& direction, Eigen::Vector3d& center) = 0;
+    virtual double shape_size() = 0;
     // returns the shape type, only used for coloring atm
     virtual shape get_shape() = 0;
     // draw the shape in a pcl visualizer window

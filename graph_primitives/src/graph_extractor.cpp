@@ -17,7 +17,6 @@ void graph_extractor::construct_adjacency_graph(std::vector<MatrixXd>& inliers)
     v.resize(primitives.size());
     for (int i = 0; i < primitives.size(); ++i) {
         v[i] = boost::add_vertex(g);
-
     }
     double mindist;
     for (int i = 1; i < inliers.size(); ++i) {
@@ -25,7 +24,8 @@ void graph_extractor::construct_adjacency_graph(std::vector<MatrixXd>& inliers)
             mindist = primitive_distance(inliers[i], inliers[j]);
             std::cout << "Min dist for " << i << " and " << j << " is " << mindist << std::endl;
             if (mindist < adjacency_dist) {
-                boost::add_edge(v[i], v[j], g);
+                edge_weight_property e = 5.0;
+                boost::add_edge(v[i], v[j], e, g);
             }
         }
     }

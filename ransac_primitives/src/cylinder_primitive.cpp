@@ -183,3 +183,13 @@ double cylinder_primitive::distance_to_pt(const Vector3d& pt)
 {
     return fabs((basis.transpose()*(pt - c)).norm() - r);
 }
+
+void cylinder_primitive::direction_and_center(Eigen::Vector3d& direction, Eigen::Vector3d& center)
+{
+    direction = a;
+}
+
+double cylinder_primitive::shape_size()
+{
+    return r;
+}

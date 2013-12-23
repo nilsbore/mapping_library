@@ -20,6 +20,8 @@ public:
                 double inlier_threshold, double angle_threshold);
     int points_required();
     double distance_to_pt(const Eigen::Vector3d& pt);
+    void direction_and_center(Eigen::Vector3d& direction, Eigen::Vector3d& center);
+    double shape_size();
     shape get_shape();
     void draw(boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer);
     base_primitive* instantiate();

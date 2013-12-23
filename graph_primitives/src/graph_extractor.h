@@ -30,6 +30,7 @@ public:
             shape = "ellipse";
             break;
         default:
+            std::cout << "no match!!" << std::endl;
             break;
         }
         out << "[label=\"" << name << "\"]";
@@ -44,9 +45,10 @@ private:
 class graph_extractor
 {
 public:
+    typedef boost::property<boost::edge_weight_t, double> edge_weight_property;
     typedef boost::adjacency_list<boost::listS, boost::vecS, boost::undirectedS,
             boost::property<boost::vertex_color_t, boost::default_color_type>,
-            boost::property<boost::edge_weight_t, int>
+            edge_weight_property
             > graph;
 protected:
     graph g;

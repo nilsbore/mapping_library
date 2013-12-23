@@ -17,7 +17,7 @@ int main(int argc, char** argv)
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>());
     //std::string dirname = "/home/nbore/catkin_ws/xtionclouds";
     //std::string dirname = "/home/nbore/Data/pcldata/Pcd";
-    std::string dirname = "/home/nbore/Data/Robot data/Primitives3/renamed";
+    std::string dirname = "/home/nbore/Data/Primitives\ Forward/pcd";
     std::vector<std::string> files;
     if (!convenience::read_directory(files, dirname))
     {
@@ -35,17 +35,17 @@ int main(int argc, char** argv)
     params.min_shape = 4000;
     params.inlier_min = params.min_shape;
     params.connectedness_res = 0.02;
-    params.distance_threshold = 1.5;
+    params.distance_threshold = 2.0;
 
     primitive_visualizer viewer;
     viewer.create_thread();
 
     int counter = 0;
     for (const std::string& file : files) {
-        if (counter % 20 != 0) {
+        /*if (counter % 20 != 0) {
             ++counter;
             continue;
-        }
+        }*/
 
         if (pcl::io::loadPCDFile<pcl::PointXYZRGB> (file, *cloud) == -1)
         {
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
             return 0;
         }
 
-        std::cout << "Processing " << file << "..." << std::endl;
+        std::cout << "Processing " << file << ".." << std::endl;
         /*for (int i = 0; i < cloud->size(); ++i) {
             cloud->points[i].x *= 0.4;
             cloud->points[i].y *= 0.4;
