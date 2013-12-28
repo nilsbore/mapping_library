@@ -1,4 +1,4 @@
-function G = dot2mat(filename, nbr)
+function G = dot2mat(filename)
 
 fid = fopen(filename);
 G = {};
