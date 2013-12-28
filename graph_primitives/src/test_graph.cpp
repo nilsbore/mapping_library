@@ -3,6 +3,8 @@
 #include <pcl/io/pcd_io.h>
 #include <pcl/filters/voxel_grid.h>
 #include <dirent.h>
+#include <iomanip>
+#include <sstream>
 
 #include "files.h"
 #include "primitive_extractor.h"
@@ -29,7 +31,7 @@ int main(int argc, char** argv)
     primitive_params params;
     params.octree_res = 0.04;
     params.normal_neigbourhood = 0.02;
-    params.inlier_threshold = 0.01;
+    params.inlier_threshold = 0.015;
     params.angle_threshold = 0.4;
     params.add_threshold = 0.01;
     params.min_shape = 4000;
@@ -78,7 +80,10 @@ int main(int argc, char** argv)
 
         graph_extractor ge(extracted, inliers, 0.1);
         std::string graphdir = "/home/nbore/Workspace/mapping_library/graph_primitives/graphs/";
-        std::string graphfile = graphdir + "test.dot";
+        std::stringstream ss;
+        ss << "graph" << std::setfill('0') << std::setw(6) << counter << ".dot";
+        std::cout << ss.str() << std::endl;
+        std::string graphfile = graphdir + ss.str();
         std::string imagefile = graphdir + "test.png";
         ge.generate_dot_file(graphfile);
         std::string command = "dot -Tpng " + graphfile + " > " + imagefile + " && gvfs-open " + imagefile;
