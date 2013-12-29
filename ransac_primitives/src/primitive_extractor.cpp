@@ -93,11 +93,6 @@ void primitive_extractor::estimate_normals()
     // cloud_normals->points.size () should have the same size as the input cloud->points.size ()*
 }
 
-void breakpoint()
-{
-
-}
-
 void primitive_extractor::extract(std::vector<base_primitive*>& extracted)
 {
     extracted.clear(); // extracted primitives
@@ -205,16 +200,7 @@ void primitive_extractor::extract(std::vector<base_primitive*>& extracted)
                 }
                 else if (p->are_contained(best_candidate->supporting_inds)) {
                     // remove candidate
-                    double temp = pow(1 - double(p->get_inliers())/double(octree.size()), 3.0)*candidates_evaluated;
-                    if (std::isinf(temp)) {
-                        std::cout << "p->get_inliers(): " << p->get_inliers() << std::endl;
-                        std::cout << "octree.size(): " << octree.size() << std::endl;
-                        std::cout << "temp: " << temp << std::endl;
-                        std::cout << "1 - double(p->get_inliers())/double(octree.size()): " << 1 - double(p->get_inliers())/double(octree.size()) << std::endl;
-                        std::cout << "candidates_evaluated: " << candidates_evaluated << std::endl;
-                        breakpoint();
-                    }
-                    candidates_evaluated = temp;
+                    candidates_evaluated *= pow(1 - double(p->get_inliers())/double(octree.size()), 3.0);
                     delete p;
                 }
                 else {
@@ -229,7 +215,6 @@ void primitive_extractor::extract(std::vector<base_primitive*>& extracted)
 
         prob_not_found = prob_candidate_not_found(params.min_shape, candidates_evaluated, min_set);
         if (std::isinf(prob_not_found)) {
-            breakpoint();
             clear_primitives(extracted);
             break;
         }
@@ -240,10 +225,7 @@ void primitive_extractor::extract(std::vector<base_primitive*>& extracted)
         ++iteration;
     }
     while (prob_not_found > params.add_threshold);
-    if (extracted.empty()) {
-        std::cout << "prob_not_found: " << prob_not_found << std::endl;
-        breakpoint();
-    }
+
     // min_set because that will be the most unlikely shape
     clear_primitives(candidates);
 }
@@ -370,8 +352,6 @@ double primitive_extractor::prob_candidate_not_found(double candidate_size,
                                                      int points_required)
 {
     double intpart = octree.size()*tree_depth*(1 << points_required);
-    std::cout << octree.size() << ", " << tree_depth << ", " << (1 << points_required) <<
-                 ", " << candidate_size << ", " << candidates_evaluated << ", " << intpart << std::endl;
     return pow(1.0f - candidate_size/intpart, candidates_evaluated);
 }
 
