@@ -44,10 +44,6 @@ int main(int argc, char** argv)
 
     int counter = 0;
     for (const std::string& file : files) {
-        /*if (counter % 20 != 0) {
-            ++counter;
-            continue;
-        }*/
 
         if (pcl::io::loadPCDFile<pcl::PointXYZRGB> (file, *cloud) == -1)
         {
@@ -55,11 +51,7 @@ int main(int argc, char** argv)
             return 0;
         }
 
-        std::cout << "Processing " << file << ".." << std::endl;
-        /*for (int i = 0; i < cloud->size(); ++i) {
-            cloud->points[i].x *= 0.4;
-            cloud->points[i].y *= 0.4;
-        }*/
+        std::cout << "Processing " << file << "..." << std::endl;
 
         primitive_extractor pe(cloud, primitives, params, &viewer);
         viewer.cloud = pe.get_cloud();
@@ -89,7 +81,6 @@ int main(int argc, char** argv)
         std::string command = "dot -Tpng " + graphfile + " > " + imagefile + " && gvfs-open " + imagefile;
         system(command.c_str());
 
-        //break;
         ++counter;
     }
 
