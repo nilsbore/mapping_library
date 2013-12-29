@@ -26,8 +26,8 @@ while true
    else
        n = regexp(tline, pat2, 'names')
        G.edges = [G.edges; uint32(zeros(1, 3))];
-       G.edges(end, 1) = str2num(n.from);
-       G.edges(end, 2) = str2num(n.to);
+       G.edges(end, 1) = str2num(n.from) + 1;
+       G.edges(end, 2) = str2num(n.to) + 1;
        G.edges(end, 3) = str2num(n.angle);
        G.edges
    end
