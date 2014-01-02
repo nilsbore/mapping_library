@@ -37,6 +37,7 @@ public:
         out << "[shape=\"" << shape << "\"]";
         out << "[style=\"filled\"]";
         out << "[fillcolor=\"" << convenience::rgb_to_hex_string(p->red, p->green, p->blue) << "\"]";
+        out << "[shapesize=\"" << p->shape_size() << "\"]";
     }
 private:
     std::vector<base_primitive*>& primitives;
