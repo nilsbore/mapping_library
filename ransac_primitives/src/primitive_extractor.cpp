@@ -6,10 +6,11 @@
 
 #include <iomanip>
 #include <time.h>
-#include <pcl/features/normal_3d.h>
+//#include <pcl/features/normal_3d.h>
+#include <pcl/features/normal_3d_omp.h>
 #include <pcl/filters/passthrough.h>
 
-#define PRINTOUTS true
+#define PRINTOUTS false
 
 using namespace Eigen;
 
@@ -75,7 +76,7 @@ void primitive_extractor::remove_distant_points(pcl::PointCloud<pcl::PointXYZRGB
 void primitive_extractor::estimate_normals()
 {
     // Create the normal estimation class, and pass the input dataset to it
-    pcl::NormalEstimation<pcl::PointXYZRGB, pcl::Normal> ne;
+    pcl::NormalEstimationOMP<pcl::PointXYZRGB, pcl::Normal> ne;
     ne.setInputCloud(cloud);
 
     // Create an empty kdtree representation, and pass it to the normal estimation object.
@@ -228,6 +229,11 @@ void primitive_extractor::extract(std::vector<base_primitive*>& extracted)
 
     // min_set because that will be the most unlikely shape
     clear_primitives(candidates);
+
+    // compute the sizes of the extracted primitives
+    for (base_primitive* p : extracted) {
+        p->compute_shape_size(mpoints);
+    }
 }
 
 void primitive_extractor::clear_primitives(std::vector<base_primitive*>& ps)

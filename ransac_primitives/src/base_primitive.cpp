@@ -9,6 +9,11 @@ int base_primitive::min_inliers = 100;
 double base_primitive::margin = 0.03;
 double base_primitive::connectedness_res = 0.01;
 
+void base_primitive::compute_shape_size(const MatrixXd& points)
+{
+
+}
+
 bool base_primitive::are_contained(const std::vector<int>& other_inds)
 {
     // check if the primitives share any inliers

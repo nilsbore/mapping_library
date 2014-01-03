@@ -10,6 +10,7 @@ class plane_primitive : public base_primitive
 private:
     Eigen::Vector4d p;
     Eigen::Matrix<double, 3, 2> basis;
+    Eigen::Vector2d sizes;
 public:
     bool construct(const Eigen::MatrixXd& points, const Eigen::MatrixXd& normals,
                    double inlier_threshold, double angle_threshold);
@@ -19,6 +20,7 @@ public:
     double distance_to_pt(const Eigen::Vector3d& pt);
     void direction_and_center(Eigen::Vector3d& direction, Eigen::Vector3d& center);
     double shape_size();
+    void compute_shape_size(const Eigen::MatrixXd& points);
     shape get_shape();
     void draw(boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer);
     base_primitive* instantiate();

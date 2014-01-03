@@ -45,6 +45,26 @@ bool plane_primitive::construct(const MatrixXd& points, const MatrixXd& normals,
     return true;
 }
 
+void plane_primitive::compute_shape_size(const MatrixXd& points)
+{
+    int n = supporting_inds.size();
+    MatrixXd A(n, 4);
+    int counter = 0;
+    for (const int& i : supporting_inds) {
+        A.block<1, 3>(counter, 0) = points.col(i).transpose();
+        A(counter, 3) = 1;
+        ++counter;
+    }
+    JacobiSVD<MatrixXd> svd(A, ComputeThinV);
+    std::cout << svd.matrixV() << std::endl;
+    A.block(0, 0, n, 3) *= svd.matrixV().block<3, 3>(0, 1);
+    RowVector4d maxc = A.colwise().maxCoeff();
+    RowVector4d minc = A.colwise().minCoeff();
+
+    sizes(0) = fabs(maxc(0) - minc(0));
+    sizes(1) = fabs(maxc(1) - minc(1));
+}
+
 int plane_primitive::inliers(const MatrixXd& points, const MatrixXd& normals, const std::vector<int>& inds,
                              double inlier_threshold, double angle_threshold)
 {
@@ -165,5 +185,5 @@ void plane_primitive::direction_and_center(Eigen::Vector3d& direction, Eigen::Ve
 
 double plane_primitive::shape_size()
 {
-    return 0;
+    return sizes(0)*sizes(1);
 }
