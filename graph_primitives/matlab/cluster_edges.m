@@ -36,4 +36,7 @@ figure
 plot3(X{cyli, cyli}(1, :), X{cyli, cyli}(2, :), X{cyli, cyli}(3, :), '*')
 Gprim = [];
 
+figure
+hist([X{planei, cyli}(1, :) X{planei, planei}(1, :) X{cyli, cyli}(1, :)]);
+
 end
