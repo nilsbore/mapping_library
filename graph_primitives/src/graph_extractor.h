@@ -73,6 +73,7 @@ protected:
     double primitive_distance(Eigen::MatrixXd& inliers1, Eigen::MatrixXd& inliers2);
 public:
     void generate_dot_file(const std::string& filename);
+    void generate_index_file(const std::string& filename);
     graph_extractor(const std::vector<base_primitive*>& primitives, std::vector<Eigen::MatrixXd>& inliers, double adjacency_dist);
 };
 

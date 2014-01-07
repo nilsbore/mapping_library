@@ -12,6 +12,8 @@ pat2 = '(?<from>\d+)--(?<to>\d+).+\[label="(?<angle>\d*\.?\d*?)"\]?.+';
 
 p = primitives;
 
+alpha = 0.2;
+
 while true
    tline = fgetl(fid);
    if ~ischar(tline)
@@ -28,12 +30,19 @@ while true
        G.nodesizes = [G.nodesizes; str2double(n.size)];
    else
        n = regexp(tline, pat2, 'names')
-       G.edges = [G.edges; uint32(zeros(1, 3))];
-       G.edges(end, 1) = str2num(n.from) + 1;
-       G.edges(end, 2) = str2num(n.to) + 1;
-       G.edges(end, 3) = str2num(n.angle);
-       G.edgeangles = [G.edgeangles; str2double(n.angle)];
-       G.edges
+       angle = str2double(n.angle);
+       if angle < alpha
+           G.edges = [G.edges; uint32(zeros(1, 3))];
+           G.edges(end, 1) = str2num(n.from) + 1;
+           G.edges(end, 2) = str2num(n.to) + 1;
+           G.edges(end, 3) = 1;
+       elseif angle > pi/2 - alpha
+           G.edges = [G.edges; uint32(zeros(1, 3))];
+           G.edges(end, 1) = str2num(n.from) + 1;
+           G.edges(end, 2) = str2num(n.to) + 1;
+           G.edges(end, 3) = 2;
+       end
+       %G.edgeangles = [G.edgeangles; angle];
    end
    %tline
 end

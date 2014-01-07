@@ -64,3 +64,14 @@ void graph_extractor::generate_dot_file(const std::string& filename)
     boost::write_graphviz(file, g, writer, edge_writer);//boost::make_label_writer(name)); // dot -Tpng test2.dot > test2.png
     file.close();
 }
+
+void graph_extractor::generate_index_file(const std::string& filename)
+{
+    std::ofstream file;
+    file.open(filename);
+    for (base_primitive* p : primitives) {
+        p->write_indices_to_stream(file);
+        file << "\n";
+    }
+    file.close();
+}

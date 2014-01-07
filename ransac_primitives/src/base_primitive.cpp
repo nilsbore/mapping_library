@@ -143,3 +143,10 @@ void base_primitive::circle_to_grid(Vector2d& rtn, const Vector2d onDisk)
     rtn(0) = 0.5*(a + 1.0);
     rtn(1) = 0.5*(b + 1.0);
 }
+
+void base_primitive::write_indices_to_stream(std::ostream& o)
+{
+    for (int i = 0; i < supporting_inds.size(); ++i) {
+        o << supporting_inds[i] << " ";
+    }
+}

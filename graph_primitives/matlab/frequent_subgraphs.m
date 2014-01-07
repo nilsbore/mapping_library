@@ -7,6 +7,9 @@ convert_graphs();
 %%
 
 load '/home/nbore/Workspace/mapping_library/graph_primitives/graphs/matgraphs.mat'
+
+%%
+
 cluster_edges(G);
 
 
@@ -15,7 +18,7 @@ cluster_edges(G);
 addpath '/home/nbore/Installs/gboost-0.1.1/bin';
 folder = '/home/nbore/Workspace/mapping_library/graph_primitives/graphs/';
 
-[subg, count, GY, indices, node_indices] = gspan(G, 10, [5 0]);
+[subg, count, GY, indices, node_indices] = gspan(G, 10, [6 0]);
 n = length(subg);
 
 %%
@@ -52,8 +55,43 @@ end
 
 %%
 
+viewer = '/home/nbore/Workspace/mapping_library/graph_primitives/bin/display_graph';
+data_folder = '/home/nbore/Data/Primitives\ Forward/pcd/';
+ld_path = getenv('LD_LIBRARY_PATH');
+setenv('LD_LIBRARY_PATH', '');
+
+% show all the partitioned clouds for one extracted graph
+ind = 1;
+m = length(indices{ind});
+for i = 1:m
+    fileind = indices{ind}(i) - 1;
+    index = [folder sprintf('indices%.6d.txt', fileind)]
+    pcdfile = [data_folder sprintf('cloud%.6d.pcd', fileind)]
+    ii = node_indices{ind}(:, i);
+    gs = length(G{fileind + 1}.nodelabels)
+    ordering = zeros(1, gs);
+    for j = 1:length(ii)
+        ordering(ii(j)) = j;
+    end
+    os = '"';
+    for j = 1:gs
+        os = [os ' ' num2str(ordering(j))];
+    end
+    os = [os '"'];
+    result = system([viewer ' ' pcdfile ' ' index ' ' os], '-echo');
+end
+
+setenv('LD_LIBRARY_PATH', ld_path);
+
+%%
+
 for i = 1:n
-    
+    vim = mean(V{i}, 2);
+    vi = V{i} - vim*ones(1, size(V{i}, 2));
+    [U, S, VV] = svd(vi');
+    vi = VV'*vi;
+    plot3(vi(1,:), vi(2,:), vi(3,:), '*')
+    pause
 end
 
 %%

@@ -81,6 +81,11 @@ int main(int argc, char** argv)
         std::string command = "dot -Tpng " + graphfile + " > " + imagefile + " && gvfs-open " + imagefile;
         system(command.c_str());
 
+        ss.str("");
+        ss << "indices" << std::setfill('0') << std::setw(6) << counter << ".txt";
+        std::string indexfile = graphdir + ss.str();
+        ge.generate_index_file(indexfile);
+
         ++counter;
     }
 

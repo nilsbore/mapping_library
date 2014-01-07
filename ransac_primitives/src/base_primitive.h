@@ -20,6 +20,8 @@ public:
     bool are_contained(const std::vector<int>& other_inds);
     int find_blobs(cv::Mat& label_image, bool wrap_height = false, bool wrap_sides = false);
     void circle_to_grid(Eigen::Vector2d& rtn, const Eigen::Vector2d onDisk);
+    // output the indices in the point cloud contained in the primitive
+    void write_indices_to_stream(std::ostream& o);
     // create a primitive, points_required points and normals needed for the operation
     virtual bool construct(const Eigen::MatrixXd& points, const Eigen::MatrixXd& normals,
                            double inlier_threshold, double angle_threshold) = 0;
