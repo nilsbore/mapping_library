@@ -55,6 +55,22 @@ end
 
 %%
 
+data_folder = '/home/nbore/Data/Primitives\ Forward/pcd/';
+
+% show all the partitioned clouds for one extracted graph
+ind = 1;
+m = length(indices{ind});
+for i = 1:m
+    fileind = indices{ind}(i) - 1;
+    index = [folder sprintf('indices%.6d.txt', fileind)]
+    pcdfile = [data_folder sprintf('cloud%.6d.pcd', fileind)]
+    display_graph(pcdfile, index, node_indices{ind}(:, i), length(G{fileind+1}.nodelabels));
+end
+
+%%
+
+% alternative way that might crash less often for some reason
+
 viewer = '/home/nbore/Workspace/mapping_library/graph_primitives/bin/display_graph';
 data_folder = '/home/nbore/Data/Primitives\ Forward/pcd/';
 ld_path = getenv('LD_LIBRARY_PATH');
