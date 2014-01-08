@@ -1,19 +1,19 @@
-%%
 
-% convert the dot files from test_graphs to a matlab graph format,
+
+%% Convert the dot files from test_graphs to a matlab graph format,
 % store in /home/nbore/Workspace/mapping_library/graph_primitives/graphs/matgraphs.mat
 convert_graphs();
 
-%%
+%% Load the converted graph
 
 load '/home/nbore/Workspace/mapping_library/graph_primitives/graphs/matgraphs.mat'
 
-%%
+%% Show the histogram of the plane-plane edges
 
 cluster_edges(G);
 
 
-%%
+%% Run the basic gspan analysis
 
 addpath '/home/nbore/Installs/gboost-0.1.1/bin';
 folder = '/home/nbore/Workspace/mapping_library/graph_primitives/graphs/';
@@ -22,9 +22,8 @@ min_nodes = 4;
 [subg, count, GY, indices, node_indices] = gspan(G, 8, [min_nodes 0]);
 n = length(subg);
 
-%%
+%% Filter base on number of edges
 
-% filter base on number of edges
 min_edges = 5;
 assign_index = 1;
 lensubg = length(subg);
@@ -45,9 +44,8 @@ end
 
 n = length(subg);
 
-%%
+%% Check that the correct indices are found
 
-% check that the correct indices are found
 for i = 1:n
     [nodes, found] = size(node_indices{i});
     for j = 1:found
@@ -62,9 +60,8 @@ for i = 1:n
     end
 end
 
-%%
+%% Construct the vector spaces over continuous node pars
 
-% construct the vector spaces
 V = cell(1, n);
 
 for i = 1:n
@@ -77,12 +74,12 @@ for i = 1:n
     end
 end
 
-%%
+%% Show all the partitioned clouds for one extracted graph
+
+ind = 3;
 
 data_folder = '/home/nbore/Data/Primitives\ Forward/pcd/';
 
-% show all the partitioned clouds for one extracted graph
-ind = 3;
 m = length(indices{ind});
 for i = 1:m
     fileind = indices{ind}(i) - 1;
@@ -91,9 +88,9 @@ for i = 1:m
     display_graph(pcdfile, index, node_indices{ind}(:, i), length(G{fileind+1}.nodelabels));
 end
 
-%%
+%% Alternative way that might crash less often for some reason
 
-% alternative way that might crash less often for some reason
+ind = 1;
 
 viewer = '/home/nbore/Workspace/mapping_library/graph_primitives/bin/display_graph';
 data_folder = '/home/nbore/Data/Primitives\ Forward/pcd/';
@@ -101,7 +98,6 @@ ld_path = getenv('LD_LIBRARY_PATH');
 setenv('LD_LIBRARY_PATH', '');
 
 % show all the partitioned clouds for one extracted graph
-ind = 1;
 m = length(indices{ind});
 for i = 1:m
     fileind = indices{ind}(i) - 1;
@@ -123,7 +119,7 @@ end
 
 setenv('LD_LIBRARY_PATH', ld_path);
 
-%%
+%% Show an eigen analysis of the clustering problem
 
 for i = 1:n
     vim = mean(V{i}, 2);
@@ -134,7 +130,7 @@ for i = 1:n
     pause
 end
 
-%%
+%% Convert the graphs into dot files
 
 % [v, ind] = sort(count, 'descend');
 % count = v;
@@ -146,15 +142,13 @@ end
 % clear temp
 % GY = GY(:, ind);
 
-% convert the graphs into dot files
 for i = 1:n
     filename = [folder 'subg' sprintf('%.6d', i-1) '.dot'];
     mat2dot(subg{i}, filename);
 end
 
-%%
+%% Convert the dot files to images, show the graphs
 
-% show the graphs
 for i = 1:n
     i
     filename = [folder 'subg' sprintf('%.6d', i-1) '.dot'];
