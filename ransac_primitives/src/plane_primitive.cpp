@@ -190,5 +190,5 @@ void plane_primitive::direction_and_center(Eigen::Vector3d& direction, Eigen::Ve
 
 double plane_primitive::shape_size()
 {
-    return sizes(0)*sizes(1);
+    return sizes(0);//sizes(0)*sizes(1);
 }

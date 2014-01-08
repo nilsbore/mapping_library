@@ -30,12 +30,12 @@ hist(A, 20);
 addpath '/home/nbore/Installs/gboost-0.1.1/bin';
 
 min_nodes = 4;
-[subg, count, GY, indices, node_indices] = gspan(G, 10, [min_nodes 0]);
+[subg, count, GY, indices, node_indices] = gspan(G, 15, [min_nodes 0]);
 n = length(subg);
 
 %% Filter base on number of edges
 
-min_edges = 6;
+min_edges = 5;
 assign_index = 1;
 lensubg = length(subg);
 
