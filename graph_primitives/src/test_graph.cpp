@@ -39,8 +39,8 @@ int main(int argc, char** argv)
     params.connectedness_res = 0.02;
     params.distance_threshold = 2.0;
 
-    primitive_visualizer viewer;
-    viewer.create_thread();
+    //primitive_visualizer viewer;
+    //viewer.create_thread();
 
     int counter = 0;
     for (const std::string& file : files) {
@@ -53,11 +53,11 @@ int main(int argc, char** argv)
 
         std::cout << "Processing " << file << "..." << std::endl;
 
-        primitive_extractor pe(cloud, primitives, params, &viewer);
-        viewer.cloud = pe.get_cloud();
-        viewer.cloud_changed = true;
-        viewer.cloud_normals = pe.get_normals();
-        viewer.normals_changed = true;
+        primitive_extractor pe(cloud, primitives, params, NULL);
+        //viewer.cloud = pe.get_cloud();
+        //viewer.cloud_changed = true;
+        //viewer.cloud_normals = pe.get_normals();
+        //viewer.normals_changed = true;
         std::vector<base_primitive*> extracted;
         pe.extract(extracted);
         if (extracted.empty()) {
@@ -78,7 +78,7 @@ int main(int argc, char** argv)
         std::string graphfile = graphdir + ss.str();
         std::string imagefile = graphdir + "test.png";
         ge.generate_dot_file(graphfile);
-        std::string command = "dot -Tpng " + graphfile + " > " + imagefile + " && gvfs-open " + imagefile;
+        std::string command = "dot -Tpng " + graphfile + " > " + imagefile;// + " && gvfs-open " + imagefile;
         system(command.c_str());
 
         ss.str("");
@@ -89,7 +89,7 @@ int main(int argc, char** argv)
         ++counter;
     }
 
-    viewer.join_thread();
+    //viewer.join_thread();
 
     return 0;
 }

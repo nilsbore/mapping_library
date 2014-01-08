@@ -70,7 +70,9 @@ protected:
     double adjacency_dist;
     std::vector<base_primitive*> primitives;
     void construct_adjacency_graph(std::vector<Eigen::MatrixXd>& inliers);
-    double primitive_distance(Eigen::MatrixXd& inliers1, Eigen::MatrixXd& inliers2);
+    double primitive_distance(std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d> >& trans,
+                              const Eigen::MatrixXd& inliers1, const Eigen::MatrixXd& inliers2, bool are_planes);
+    double plane_angle(const std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d> >& trans, const Eigen::Vector3d& d1, const Eigen::Vector3d& d2);
 public:
     void generate_dot_file(const std::string& filename);
     void generate_index_file(const std::string& filename);

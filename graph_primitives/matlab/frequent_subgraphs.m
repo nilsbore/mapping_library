@@ -18,7 +18,31 @@ cluster_edges(G);
 addpath '/home/nbore/Installs/gboost-0.1.1/bin';
 folder = '/home/nbore/Workspace/mapping_library/graph_primitives/graphs/';
 
-[subg, count, GY, indices, node_indices] = gspan(G, 10, [6 0]);
+min_nodes = 4;
+[subg, count, GY, indices, node_indices] = gspan(G, 8, [min_nodes 0]);
+n = length(subg);
+
+%%
+
+% filter base on number of edges
+min_edges = 5;
+assign_index = 1;
+lensubg = length(subg);
+
+i = 1;
+while i <= lensubg
+    if size(subg{i}.edges, 1) < min_edges
+        subg(i) = [];
+        count(i) = [];
+        GY(:, i) = [];
+        indices(i) = [];
+        node_indices(i) = [];
+        lensubg = lensubg - 1;
+    else
+        i = i + 1;
+    end
+end
+
 n = length(subg);
 
 %%
@@ -58,7 +82,7 @@ end
 data_folder = '/home/nbore/Data/Primitives\ Forward/pcd/';
 
 % show all the partitioned clouds for one extracted graph
-ind = 1;
+ind = 3;
 m = length(indices{ind});
 for i = 1:m
     fileind = indices{ind}(i) - 1;
@@ -112,15 +136,15 @@ end
 
 %%
 
-[v, ind] = sort(count, 'descend');
-count = v;
-temp = cell(size(subg));
-for i = 1:n
-    temp{i} = subg{ind(i)};
-end
-subg = temp;
-clear temp
-GY = GY(:, ind);
+% [v, ind] = sort(count, 'descend');
+% count = v;
+% temp = cell(size(subg));
+% for i = 1:n
+%     temp{i} = subg{ind(i)};
+% end
+% subg = temp;
+% clear temp
+% GY = GY(:, ind);
 
 % convert the graphs into dot files
 for i = 1:n
@@ -132,6 +156,7 @@ end
 
 % show the graphs
 for i = 1:n
+    i
     filename = [folder 'subg' sprintf('%.6d', i-1) '.dot'];
     system(['dot -Tpng ' filename ' > ' folder 'test.png']);
     system(['gvfs-open ' folder 'test.png']);

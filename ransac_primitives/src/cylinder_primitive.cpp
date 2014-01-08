@@ -12,7 +12,7 @@ int cylinder_primitive::cylinders_drawn = 0;
 
 cylinder_primitive::cylinder_primitive()
 {
-    max_radius = 0.2;
+    max_radius = 0.25;
 }
 
 int cylinder_primitive::points_required()
@@ -49,7 +49,7 @@ bool cylinder_primitive::construct(const MatrixXd& points, const MatrixXd& norma
 
     r = (fabs(t(0)) + fabs(t(1)))/2.0;
 
-    if (r > max_radius) {
+    if (r > max_radius || r < 0.05) {
         return false;
     }
 
@@ -186,7 +186,12 @@ double cylinder_primitive::distance_to_pt(const Vector3d& pt)
 
 void cylinder_primitive::direction_and_center(Eigen::Vector3d& direction, Eigen::Vector3d& center)
 {
-    direction = a;
+    if (a(2) > 0) {
+        direction = -a;
+    }
+    else {
+        direction = a;
+    }
 }
 
 double cylinder_primitive::shape_size()

@@ -180,7 +180,12 @@ double plane_primitive::distance_to_pt(const Vector3d& pt)
 
 void plane_primitive::direction_and_center(Eigen::Vector3d& direction, Eigen::Vector3d& center)
 {
-    direction = p.segment<3>(0);
+    if (p(2) > 0) {
+        direction = -p.segment<3>(0);
+    }
+    else {
+        direction = p.segment<3>(0);
+    }
 }
 
 double plane_primitive::shape_size()

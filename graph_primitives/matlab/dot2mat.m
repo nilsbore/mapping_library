@@ -11,6 +11,7 @@ pat1 = '(?<node>\d+)\[label="(?<primitive>\w+)"\]?.+\[shapesize="(?<size>\d*\.?\
 pat2 = '(?<from>\d+)--(?<to>\d+).+\[label="(?<angle>\d*\.?\d*?)"\]?.+';
 
 p = primitives;
+planeind = cellfind(p, 'Plane');
 
 alpha = 0.2;
 
@@ -31,18 +32,39 @@ while true
    else
        n = regexp(tline, pat2, 'names')
        angle = str2double(n.angle);
-       if angle < alpha
-           G.edges = [G.edges; uint32(zeros(1, 3))];
-           G.edges(end, 1) = str2num(n.from) + 1;
-           G.edges(end, 2) = str2num(n.to) + 1;
-           G.edges(end, 3) = 1;
-       elseif angle > pi/2 - alpha
-           G.edges = [G.edges; uint32(zeros(1, 3))];
-           G.edges(end, 1) = str2num(n.from) + 1;
-           G.edges(end, 2) = str2num(n.to) + 1;
-           G.edges(end, 3) = 2;
+       from = str2num(n.from) + 1;
+       to = str2num(n.to) + 1;
+       if G.nodelabels(from) == planeind && G.nodelabels(to) == planeind
+           if abs(angle - pi/2) < alpha
+               G.edges = [G.edges; uint32(zeros(1, 3))];
+               G.edges(end, 1) = from;
+               G.edges(end, 2) = to;
+               G.edges(end, 3) = 1;
+           elseif abs(angle - pi) < alpha
+               G.edges = [G.edges; uint32(zeros(1, 3))];
+               G.edges(end, 1) = from;
+               G.edges(end, 2) = to;
+               G.edges(end, 3) = 2;
+           elseif abs(angle - 3*pi/2) < alpha
+               G.edges = [G.edges; uint32(zeros(1, 3))];
+               G.edges(end, 1) = from;
+               G.edges(end, 2) = to;
+               G.edges(end, 3) = 3;
+           end
+           G.edgeangles = [G.edgeangles; angle]
+       else
+           if abs(angle - 0) < alpha
+               G.edges = [G.edges; uint32(zeros(1, 3))];
+               G.edges(end, 1) = from;
+               G.edges(end, 2) = to;
+               G.edges(end, 3) = 1;
+           elseif abs(angle - pi/2) < alpha
+               G.edges = [G.edges; uint32(zeros(1, 3))];
+               G.edges(end, 1) = from;
+               G.edges(end, 2) = to;
+               G.edges(end, 3) = 2;
+           end
        end
-       %G.edgeangles = [G.edgeangles; angle];
    end
    %tline
 end
