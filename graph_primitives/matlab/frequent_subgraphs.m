@@ -2,29 +2,40 @@
 
 %% Convert the dot files from test_graphs to a matlab graph format,
 % store in /home/nbore/Workspace/mapping_library/graph_primitives/graphs/matgraphs.mat
-convert_graphs();
+folder = '/home/nbore/Workspace/mapping_library/graph_primitives/graphs/';
+convert_graphs(folder, 'matgraphs.mat');
 
 %% Load the converted graph
 
-load '/home/nbore/Workspace/mapping_library/graph_primitives/graphs/matgraphs.mat'
+folder = '/home/nbore/Workspace/mapping_library/graph_primitives/graphs/';
+graphfile = [folder 'matgraphs.mat'];
+load(graphfile)
 
 %% Show the histogram of the plane-plane edges
 
-cluster_edges(G);
+A = [];
+
+n = length(G);
+for i = 1:n
+    if G{i}.edgeangles
+        A = [A; G{i}.edgeangles];
+    end
+end
+
+hist(A, 20);
 
 
 %% Run the basic gspan analysis
 
 addpath '/home/nbore/Installs/gboost-0.1.1/bin';
-folder = '/home/nbore/Workspace/mapping_library/graph_primitives/graphs/';
 
 min_nodes = 4;
-[subg, count, GY, indices, node_indices] = gspan(G, 8, [min_nodes 0]);
+[subg, count, GY, indices, node_indices] = gspan(G, 10, [min_nodes 0]);
 n = length(subg);
 
 %% Filter base on number of edges
 
-min_edges = 5;
+min_edges = 6;
 assign_index = 1;
 lensubg = length(subg);
 
@@ -76,7 +87,7 @@ end
 
 %% Show all the partitioned clouds for one extracted graph
 
-ind = 3;
+ind = 2;
 
 data_folder = '/home/nbore/Data/Primitives\ Forward/pcd/';
 

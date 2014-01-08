@@ -1,8 +1,7 @@
-function convert_graphs()
+function convert_graphs(graph_folder, filename)
 
 G = {};
 
-graph_folder = '/home/nbore/Workspace/mapping_library/graph_primitives/graphs/';
 listing = dir([graph_folder 'graph*.dot']);
 l = length(listing);
 for i = 1:l
@@ -10,7 +9,7 @@ for i = 1:l
     G{i} = dot2mat(di);
 end
 
-filename = [graph_folder 'matgraphs.mat'];
+filename = [graph_folder filename];
 save(filename, 'G')
 
 end
