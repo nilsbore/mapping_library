@@ -141,6 +141,33 @@ for i = 1:n
     pause
 end
 
+%% Find connected components
+
+i = 1;
+while i < n
+    connected = connected_components(V{i}, 0.2);
+    maxc = 0;
+    p = [];
+    for j = 1:length(connected)
+        if length(connected{j}) > maxc
+            p = connected{j};
+            maxc = length(p);
+        end
+    end
+    if maxc < 10
+        subg(i) = [];
+        count(i) = [];
+        GY(:, i) = [];
+        indices(i) = [];
+        node_indices(i) = [];
+        n = n - 1;
+    else
+        indices{i} = indices{i}(p);
+        node_indices{i} = node_indices{i}(:, p);
+        i = i + 1;
+    end
+end
+
 %% Convert the graphs into dot files
 
 % [v, ind] = sort(count, 'descend');
