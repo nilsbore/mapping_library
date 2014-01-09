@@ -16,10 +16,17 @@
 
 int main(int argc, char** argv)
 {
+	if (argc < 3) {
+		std::cout << "You need to supply the folder containing the pcd files and the output folder for the dot and index files..." << std::endl;
+	}
+
+	std::string dirname(argv[1]);
+	std::string graphdir(argv[2]);
+
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>());
     //std::string dirname = "/home/nbore/catkin_ws/xtionclouds";
     //std::string dirname = "/home/nbore/Data/pcldata/Pcd";
-    std::string dirname = "/home/nbore/Data/Primitives\ Forward/pcd";
+    //std::string dirname = "/home/robo/Data/Primitives\ Forward/pcd";
     std::vector<std::string> files;
     if (!convenience::read_directory(files, dirname))
     {
@@ -71,9 +78,9 @@ int main(int argc, char** argv)
         }
 
         graph_extractor ge(extracted, inliers, 0.1);
-        std::string graphdir = "/home/nbore/Workspace/mapping_library/graph_primitives/graphs/";
+        //std::string graphdir = "/home/nbore/Workspace/mapping_library/graph_primitives/graphs/";
         std::stringstream ss;
-        ss << "graph" << std::setfill('0') << std::setw(6) << counter << ".dot";
+        ss << "/graph" << std::setfill('0') << std::setw(6) << counter << ".dot";
         std::cout << ss.str() << std::endl;
         std::string graphfile = graphdir + ss.str();
         std::string imagefile = graphdir + "test.png";
