@@ -37,17 +37,17 @@ int main(int argc, char** argv)
     std::vector<base_primitive*> primitives = { new plane_primitive(), new cylinder_primitive(), new sphere_primitive() };
     primitive_params params;
     params.octree_res = 0.04;
-    params.normal_neigbourhood = 0.02;
+    params.normal_neigbourhood = 0.015;
     params.inlier_threshold = 0.015;
     params.angle_threshold = 0.4;
     params.add_threshold = 0.01;
     params.min_shape = 4000;
     params.inlier_min = params.min_shape;
-    params.connectedness_res = 0.02;
+    params.connectedness_res = 0.01;
     params.distance_threshold = 2.0;
 
-    //primitive_visualizer viewer;
-    //viewer.create_thread();
+    primitive_visualizer viewer;
+    viewer.create_thread();
 
     int counter = 0;
     for (const std::string& file : files) {
@@ -60,11 +60,11 @@ int main(int argc, char** argv)
 
         std::cout << "Processing " << file << "..." << std::endl;
 
-        primitive_extractor pe(cloud, primitives, params, NULL);
-        //viewer.cloud = pe.get_cloud();
-        //viewer.cloud_changed = true;
-        //viewer.cloud_normals = pe.get_normals();
-        //viewer.normals_changed = true;
+        primitive_extractor pe(cloud, primitives, params, &viewer);
+        viewer.cloud = pe.get_cloud();
+        viewer.cloud_changed = true;
+        viewer.cloud_normals = pe.get_normals();
+        viewer.normals_changed = true;
         std::vector<base_primitive*> extracted;
         pe.extract(extracted);
         if (extracted.empty()) {
@@ -96,7 +96,7 @@ int main(int argc, char** argv)
         ++counter;
     }
 
-    //viewer.join_thread();
+    viewer.join_thread();
 
     return 0;
 }

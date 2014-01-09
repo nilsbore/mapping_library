@@ -1,6 +1,6 @@
 %% Set the appropriate folders
 
-% modify this variables to point to folders on your filesystem
+% modify these variables to point to folders on your filesystem
 
 % path to folder where it finds the pcd files
 data_folder = '/home/nbore/Data/Primitives Forward/pcd/';
@@ -21,7 +21,7 @@ result = system(['../bin/test_graph "' data_folder '" "' graph_folder '"']);
 
 setenv('LD_LIBRARY_PATH', ld_path);
 
-%% Convert the dot files from test_graph to a matlab graph format,
+%% Convert the dot files from test_graph to a matlab graph format
 % store in graph_folder
 convert_graphs(graph_folder, 'matgraphs.mat');
 
