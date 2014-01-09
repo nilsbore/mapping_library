@@ -1,6 +1,27 @@
+%% Set the appropriate folders
+
+% modify this variables to point to folders on your filesystem
+
+% path to folder where it finds the pcd files
+data_folder = '/home/nbore/Data/Primitives Forward/pcd/';
+
+% path to folder to save the dot and index files
+graph_folder = '/home/nbore/Workspace/mapping_library/graph_primitives/graphs/temp';
+
+% add the gspan command
+addpath '../gboost-0.1.1/bin';
 
 
-%% Convert the dot files from test_graphs to a matlab graph format,
+%% Call test_graphs to extract primitives and create dot graph files
+
+ld_path = getenv('LD_LIBRARY_PATH');
+setenv('LD_LIBRARY_PATH', '');
+
+result = system(['../bin/test_graph "' data_folder '" "' graph_folder '"']);
+
+setenv('LD_LIBRARY_PATH', ld_path);
+
+%% Convert the dot files from test_graph to a matlab graph format,
 % store in /home/nbore/Workspace/mapping_library/graph_primitives/graphs/matgraphs.mat
 folder = '/home/nbore/Workspace/mapping_library/graph_primitives/graphs/';
 convert_graphs(folder, 'matgraphs.mat');
