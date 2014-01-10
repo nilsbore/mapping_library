@@ -114,7 +114,7 @@ end
 %% Convert the graphs into dot files
 
 for i = 1:n
-    filename = [folder 'subg' sprintf('%.6d', i-1) '.dot'];
+    filename = [graph_folder 'subg' sprintf('%.6d', i-1) '.dot'];
     mat2dot(subg{i}, filename);
 end
 
@@ -122,8 +122,8 @@ end
 
 for i = 1:n
     i
-    filename = [folder 'subg' sprintf('%.6d', i-1) '.dot'];
-    system(['dot -Tpng ' filename ' > ' folder 'test.png']);
-    system(['gvfs-open ' folder 'test.png']);
+    filename = [graph_folder 'subg' sprintf('%.6d', i-1) '.dot'];
+    system(['dot -Tpng ' filename ' > ' graph_folder 'test.png']);
+    system(['gvfs-open ' graph_folder 'test.png']);
     pause
 end
