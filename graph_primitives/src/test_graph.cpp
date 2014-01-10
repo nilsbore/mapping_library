@@ -40,7 +40,7 @@ int main(int argc, char** argv)
     params.normal_neigbourhood = 0.015;
     params.inlier_threshold = 0.015;
     params.angle_threshold = 0.4;
-    params.add_threshold = 0.01;
+    params.add_threshold = 0.001;
     params.min_shape = 4000;
     params.inlier_min = params.min_shape;
     params.connectedness_res = 0.01;
