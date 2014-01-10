@@ -131,6 +131,7 @@ int cylinder_primitive::inliers(const MatrixXd& points, const MatrixXd& normals,
     //cv::imshow("Binary1", binary1);
     //cv::waitKey(0);
 
+    cv::Mat support = cv::Mat::zeros(width, height, CV_8UC1);
     cv::Mat binary2 = cv::Mat::zeros(height, width, CV_32SC1);
 
     supporting_inds.reserve(temp.size());
@@ -139,12 +140,27 @@ int cylinder_primitive::inliers(const MatrixXd& points, const MatrixXd& normals,
     for (const Vector2i& pp : plane_ptsi) {
         if (binary.at<int>(pp(1), pp(0)) == largest) {
             supporting_inds.push_back(temp[counter]);
+            support.at<unsigned char>(pp(0), pp(1)) = 1;
             binary2.at<int>(pp(1), pp(0)) = 65535;
         }
         ++counter;
     }
 
-    //cv::imshow("Binary2", binary2);
+    // check how large of an angle is occupied
+    cv::Mat row_support = cv::Mat::zeros(1, height, CV_32SC1);
+    cv::reduce(support, row_support, 0, CV_REDUCE_SUM, CV_32SC1);
+    int nonzero = cv::countNonZero(row_support);
+
+    if (double(nonzero)/double(height) < 0.25) { // make this a parameter
+        supporting_inds.clear();
+        return 0;
+    }
+
+    cv::Mat col_support = cv::Mat::zeros(1, width, CV_32SC1);
+    cv::reduce(support.t(), col_support, 0, CV_REDUCE_SUM, CV_32SC1);
+
+    //std::cout << "Non zero: " << nonzero << "/" << height << std::endl;
+    //cv::imshow("support", binary2);
     //cv::waitKey(0);
 
     std::sort(supporting_inds.begin(), supporting_inds.end());

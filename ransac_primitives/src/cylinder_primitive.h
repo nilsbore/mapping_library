@@ -11,6 +11,7 @@ private:
     Eigen::Vector3d a;
     Eigen::Vector3d c;
     double r;
+    double h;
     Eigen::Matrix<double, 3, 2> basis;
     double max_radius;
     static int cylinders_drawn;
