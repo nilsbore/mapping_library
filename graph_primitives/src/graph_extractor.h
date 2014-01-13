@@ -38,6 +38,16 @@ public:
         out << "[style=\"filled\"]";
         out << "[fillcolor=\"" << convenience::rgb_to_hex_string(p->red, p->green, p->blue) << "\"]";
         out << "[shapesize=\"" << p->shape_size() << "\"]";
+        out << "[shapedata=\"";
+        Eigen::VectorXd data;
+        p->shape_data(data);
+        for (int i = 0; i < data.rows(); ++i) {
+            if (i != 0) {
+                out << " ";
+            }
+            out << data(i);
+        }
+        out << "\"]";
     }
 private:
     std::vector<base_primitive*>& primitives;
