@@ -6,8 +6,9 @@ G.edges = uint32([]);
 G.edgeangles = [];
 G.nodelabels = uint32([]);
 G.nodesizes = [];
+G.nodedata = [];
 
-pat1 = '(?<node>\d+)\[label="(?<primitive>\w+)"\]?.+\[shapesize="(?<size>\d*\.?\d*?)"\]?.+';
+pat1 = '(?<node>\d+)\[label="(?<primitive>\w+)"\]?.+\[shapesize="(?<size>\d*\.?\d*?)"\]?.+\[shapedata="(?<data>[^"]*)"\]?.+';
 pat2 = '(?<from>\d+)--(?<to>\d+).+\[label="(?<angle>\d*\.?\d*?)"\]?.+';
 
 p = primitives;
@@ -29,6 +30,9 @@ while true
        G.nodelabels = [G.nodelabels; uint32(0)];
        G.nodelabels(end) = cellfind(p, n.primitive);
        G.nodesizes = [G.nodesizes; str2double(n.size)];
+       G.nodedata = [G.nodedata; zeros(1, 8)];
+       pars = strread(n.data);
+       G.nodedata(end, 1:length(pars)) = pars;
    else
        n = regexp(tline, pat2, 'names')
        angle = str2double(n.angle);
