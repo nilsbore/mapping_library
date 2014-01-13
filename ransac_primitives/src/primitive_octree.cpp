@@ -48,7 +48,7 @@ void primitive_octree::remove_point(int ind)
     if (leafNode != NULL) {
         if (!leafNode->remove_if_equal(ind)) {
             std::cout << "Couldn't remove point!" << std::endl;
-            exit(0);
+            //exit(0); // FIXME: this happened once in the big dataset for some reason
         }
     }
     else {
