@@ -147,6 +147,7 @@ int cylinder_primitive::inliers(const MatrixXd& points, const MatrixXd& normals,
     }
 
     // check how large of an angle is occupied
+    // should this be done afterwards instead?
     cv::Mat row_support = cv::Mat::zeros(1, height, CV_32SC1);
     cv::reduce(support, row_support, 0, CV_REDUCE_SUM, CV_32SC1);
     int nonzero = cv::countNonZero(row_support);
@@ -155,9 +156,6 @@ int cylinder_primitive::inliers(const MatrixXd& points, const MatrixXd& normals,
         supporting_inds.clear();
         return 0;
     }
-
-    cv::Mat col_support = cv::Mat::zeros(1, width, CV_32SC1);
-    cv::reduce(support.t(), col_support, 0, CV_REDUCE_SUM, CV_32SC1);
 
     //std::cout << "Non zero: " << nonzero << "/" << height << std::endl;
     //cv::imshow("support", binary2);
@@ -210,7 +208,35 @@ void cylinder_primitive::direction_and_center(Eigen::Vector3d& direction, Eigen:
     }
 }
 
+void cylinder_primitive::compute_shape_size(const MatrixXd& points)
+{
+    double minx = INFINITY;
+    double maxx = -INFINITY;
+
+    double x;
+    for (const int& i : supporting_inds) {
+        x = a.dot(points.col(i));
+        if (x < minx) {
+            minx = x;
+        }
+        if (x > maxx) {
+            maxx = x;
+        }
+    }
+
+    h = fabs(maxx - minx);
+}
+
 double cylinder_primitive::shape_size()
 {
     return r;
+}
+
+double cylinder_primitive::shape_data(VectorXd& data)
+{
+    data.resize(8);
+    data.segment<3>(0) = a;
+    data.segment<3>(3) = c;
+    data(6) = r;
+    data(7) = h;
 }

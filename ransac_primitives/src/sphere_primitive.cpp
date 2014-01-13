@@ -278,3 +278,10 @@ double sphere_primitive::shape_size()
 {
     return r;
 }
+
+double sphere_primitive::shape_data(VectorXd& data)
+{
+    data.resize(4);
+    data.segment<3>(0) = c;
+    data(3) = r;
+}

@@ -33,7 +33,7 @@ load(graphfile)
 %% Run the basic gspan analysis
 
 min_nodes = 4;
-[subg, count, GY, indices, node_indices] = gspan(G, 15, [min_nodes 0]);
+[subg, count, GY, indices, node_indices] = gspan(G, 15, [min_nodes min_nodes]);
 n = length(subg);
 
 %% Filter base on number of edges

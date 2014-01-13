@@ -190,5 +190,12 @@ void plane_primitive::direction_and_center(Eigen::Vector3d& direction, Eigen::Ve
 
 double plane_primitive::shape_size()
 {
-    return sizes(0);//sizes(0)*sizes(1);
+    return sizes(1);//sizes(0)*sizes(1);
+}
+
+double plane_primitive::shape_data(VectorXd& data)
+{
+    data.resize(6);
+    data.segment<4>(0) = p;
+    data.segment<2>(4) = sizes;
 }

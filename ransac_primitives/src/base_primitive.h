@@ -36,6 +36,7 @@ public:
     // used to find the relative angles between primitives
     virtual void direction_and_center(Eigen::Vector3d& direction, Eigen::Vector3d& center) = 0;
     virtual double shape_size() = 0;
+    virtual double shape_data(Eigen::VectorXd& data) = 0;
     virtual void compute_shape_size(const Eigen::MatrixXd& points);
     // returns the shape type, only used for coloring atm
     virtual shape get_shape() = 0;
