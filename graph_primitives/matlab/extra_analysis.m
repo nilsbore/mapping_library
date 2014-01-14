@@ -9,7 +9,7 @@ for i = 1:m
     end
 end
 
-hist(A, 20);
+hist(A, 100);
 
 %% Check that the correct indices are found
 
@@ -60,6 +60,27 @@ for i = 1:m
     end
 end
 
-hist(planesizes, 20)
+hist(planesizes, 30)
 figure
-hist(cylindersizes, 20)
+hist(cylindersizes, 30)
+
+%% Convert the positions to the map coordinate system
+
+P = positions(:, 1:2)';
+P(2, :) = -P(2, :);
+minp = min(P, [], 2);
+maxp = max(P, [], 2);
+
+[m, n] = size(map);
+dist = maxp - minp;
+
+l = length(P);
+P = P - minp*ones(1, l);
+P = P.*(([n; m]./dist)*ones(1, l));
+
+% this is just a heuristic to find a transformation that looks good
+P = (P + [110; -100]*ones(1, l)).*([0.75; 0.47]*ones(1, l))  + [7; 140]*ones(1, l);
+
+imshow(map)
+hold on
+plot(P(1, :), P(2, :), '*r', 'MarkerSize', 2)

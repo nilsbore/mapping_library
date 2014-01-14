@@ -70,7 +70,6 @@ int main(int argc, char** argv)
 
     pcl::visualization::PCLVisualizer viewer;
     viewer.setBackgroundColor(0, 0, 0);
-    viewer.addCoordinateSystem(1.0);
     viewer.initCameraParameters();
     pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(filtered_cloud);
     viewer.addPointCloud<pcl::PointXYZRGB>(filtered_cloud, rgb, "cloud");

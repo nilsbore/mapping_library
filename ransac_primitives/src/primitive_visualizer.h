@@ -26,7 +26,7 @@ public:
     {
         viewer->setBackgroundColor(0, 0, 0);
         // Starting visualizer
-        viewer->addCoordinateSystem(1.0);
+        //viewer->addCoordinateSystem(1.0);
         viewer->initCameraParameters();
         cloud_changed = false;
         normals_changed = false;

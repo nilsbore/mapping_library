@@ -3,10 +3,10 @@
 % modify these variables to point to folders on your filesystem
 
 % path to folder where it finds the pcd files
-data_folder = '/home/nbore/Data/Primitives Forward/pcd/';
+data_folder = '/home/nbore/Data/primitive2/pcd/';
 
 % path to folder to save the dot and index files
-graph_folder = '/home/nbore/Workspace/mapping_library/graph_primitives/graphs/';
+graph_folder = '/home/nbore/Workspace/mapping_library/graph_primitives/graphs/dot_graphs/';
 
 % add the gspan command
 addpath '../gboost-0.1.1/bin';
@@ -25,15 +25,26 @@ setenv('LD_LIBRARY_PATH', ld_path);
 % store in graph_folder
 convert_graphs(graph_folder, 'matgraphs.mat');
 
+%% Read the positions and store them in a matlab format
+% store in graph_folder
+convert_positions(data_folder, graph_folder, 'positions.mat');
+
 %% Load the converted graph
 
 graphfile = [graph_folder 'matgraphs.mat'];
 load(graphfile)
 
+%% Load the converted positions and the map
+
+posfile = [graph_folder 'positions.mat'];
+load(posfile)
+mapfile = [graph_folder 'map.mat'];
+load(mapfile)
+
 %% Run the basic gspan analysis
 
 min_nodes = 4;
-[subg, count, GY, indices, node_indices] = gspan(G, 15, [min_nodes min_nodes]);
+[subg, count, GY, indices, node_indices] = gspan(G, 30, [min_nodes min_nodes]);
 n = length(subg);
 
 %% Filter base on number of edges
@@ -74,7 +85,7 @@ end
 
 %% Show all the partitioned clouds for one extracted graph
 
-ind = 2;
+ind = 18;
 
 m = length(indices{ind});
 for i = 1:m

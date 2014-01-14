@@ -59,6 +59,10 @@ int main(int argc, char** argv)
         }
 
         std::cout << "Processing " << file << "..." << std::endl;
+        if (cloud->size() == 0) {
+            // just write an empty dot file
+
+        }
 
         primitive_extractor pe(cloud, primitives, params, &viewer);
         viewer.cloud = pe.get_cloud();
