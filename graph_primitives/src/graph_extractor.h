@@ -53,6 +53,13 @@ private:
     std::vector<base_primitive*>& primitives;
 };
 
+struct primitive_edge
+{
+    int type;
+    double angle;
+    double dist;
+};
+
 template <class Graph>
 class primitive_edge_writer {
 public:
@@ -60,8 +67,12 @@ public:
     primitive_edge_writer(Graph& g) : g(g) {}
     //template <class VertexOrEdge>
     void operator()(std::ostream& out, const typename boost::graph_traits<Graph>::edge_descriptor& e) const {
-        double v = boost::get(boost::edge_weight_t(), g, e);
-        out << "[label=\"" << v << "\"]";
+        primitive_edge v = boost::get(boost::edge_weight_t(), g, e);
+        out << "[label=\"" << v.angle << "\"]";
+        out << "[shapedist=\"" << v.dist << "\"]";
+        if (v.type == 1) {
+            out << "[style=\"dashed\"]";
+        }
     }
 private:
     Graph& g;
@@ -70,7 +81,7 @@ private:
 class graph_extractor
 {
 public:
-    typedef boost::property<boost::edge_weight_t, double> edge_weight_property;
+    typedef boost::property<boost::edge_weight_t, primitive_edge> edge_weight_property;
     typedef boost::adjacency_list<boost::listS, boost::vecS, boost::undirectedS,
             boost::property<boost::vertex_color_t, boost::default_color_type>,
             edge_weight_property

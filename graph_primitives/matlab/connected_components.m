@@ -12,7 +12,7 @@ for i = 1:n
     end
 end
 
-[p,q,r,s] = dmperm(C);
+[p,q,r,s] = dmperm(sparse(C));
 
 m = length(r) - 1;
 components = cell(1, m);

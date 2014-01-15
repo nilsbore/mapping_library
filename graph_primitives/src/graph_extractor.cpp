@@ -41,21 +41,31 @@ void graph_extractor::construct_adjacency_graph(std::vector<MatrixXd>& inliers)
             bool is_sphere = primitives[i]->get_shape() == base_primitive::SPHERE || primitives[j]->get_shape() == base_primitive::SPHERE;
             mindist = primitive_distance(trans, inliers[i], inliers[j], are_planes);
             std::cout << "Min dist for " << i << " and " << j << " is " << mindist << std::endl;
+            primitive_edge p;
+            p.dist = mindist;
+            primitives[i]->direction_and_center(d1, c1);
+            primitives[j]->direction_and_center(d2, c2);
             if (mindist < adjacency_dist) {
-                primitives[i]->direction_and_center(d1, c1);
-                primitives[j]->direction_and_center(d2, c2);
-                edge_weight_property e;
+                p.type = 0;
                 if (is_sphere) {
-                    e = 0;
+                    p.angle = 0;
                 }
                 else if (are_planes) {
-                    e = plane_angle(trans, d1, d2);
+                    p.angle = plane_angle(trans, d1, d2);
                 }
                 else {
-                    e = acos(fabs(d1.dot(d2)));
+                    p.angle = acos(fabs(d1.dot(d2)));
                 }
-                std::pair<boost::graph_traits<graph>::edge_descriptor, bool> result = boost::add_edge(v[i], v[j], e, g);
             }
+            else {
+                p.type = 1;
+                if (is_sphere) {
+                    p.angle = 0;
+                }
+                p.angle = acos(fabs(d1.dot(d2))); // no point in doing plane angle here because the one can can be in the middle of the other
+            }
+            edge_weight_property e = p;
+            std::pair<boost::graph_traits<graph>::edge_descriptor, bool> result = boost::add_edge(v[i], v[j], e, g);
         }
     }
 

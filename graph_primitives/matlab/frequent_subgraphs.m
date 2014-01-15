@@ -6,11 +6,16 @@
 data_folder = '/home/nbore/Data/primitive2/pcd/';
 
 % path to folder to save the dot and index files
-graph_folder = '/home/nbore/Workspace/mapping_library/graph_primitives/graphs/dot_graphs/';
+graph_folder = '/home/nbore/Workspace/mapping_library/graph_primitives/graphs/dot_graphs2/';
 
 % add the gspan command
 addpath '../gboost-0.1.1/bin';
 
+% get the indices of planes and cylinders
+p = primitives;
+pind = cellfind(p, 'Plane');
+cind = cellfind(p, 'Cylinder');
+sphind = cellfind(p, 'Sphere');
 
 %% Call test_graphs to extract primitives and create dot graph files
 
@@ -44,7 +49,7 @@ load(mapfile)
 %% Run the basic gspan analysis
 
 min_nodes = 4;
-[subg, count, GY, indices, node_indices] = gspan(G, 30, [min_nodes min_nodes]);
+[subg, count, GY, indices, node_indices] = gspan(G, 15, [min_nodes 0]);
 n = length(subg);
 
 %% Filter base on number of edges
@@ -54,20 +59,68 @@ assign_index = 1;
 lensubg = length(subg);
 
 i = 1;
-while i <= lensubg
-    if size(subg{i}.edges, 1) < min_edges
-        subg(i) = [];
-        count(i) = [];
-        GY(:, i) = [];
-        indices(i) = [];
-        node_indices(i) = [];
+counter = 1;
+while counter < n %i <= lensubg
+    i
+    counter
+    adjedges = sum(subg{counter}.edges(:, 3) < 4);
+    faredges = sum(subg{counter}.edges(:, 3) > 3);%size(subg{i}.edges, 1) - adjedges;
+    m = length(subg{counter}.nodelabels);
+    maxedges = m*(m - 1)/2;
+    if (adjedges < min_edges) || (faredges +  adjedges < maxedges)
+        %subg(i) = [];
+        %count(i) = [];
+        %GY(:, i) = [];
+        %indices(i) = [];
+        %node_indices(i) = [];
         lensubg = lensubg - 1;
     else
+        subg{i} = subg{counter};
+        count(i) = count(counter);
+        GY(:, i) = GY(:, counter);
+        indices{i} = indices{counter};
+        node_indices{i} = node_indices{counter};
         i = i + 1;
+    end
+    counter = counter + 1;
+end
+
+subg(i:end) = [];
+count(i:end) = [];
+GY(:, i:end) = [];
+indices(i:end) = [];
+node_indices(i:end) = [];
+n = length(subg);
+
+
+%% Show distribution of plane and cylinder sizes
+
+m = length(G);
+
+planesizes = [];
+cylindersizes = [];
+
+p = primitives;
+pind = cellfind(p, 'Plane');
+cind = cellfind(p, 'Cylinder');
+
+for i = 1:m
+    ll = G{i}.nodelabels;
+    for j = 1:length(ll)
+       if ll(j) == pind
+           planesizes = [planesizes G{i}.nodesizes(j)];
+       elseif ll(j) == cind
+           cylindersizes = [cylindersizes G{i}.nodesizes(j)];
+       end
     end
 end
 
-n = length(subg);
+hist(planesizes, 30)
+figure
+hist(cylindersizes, 30)
+
+planestd = std(planesizes)
+cylinderstd = std(cylindersizes)
 
 %% Construct the vector spaces over continuous node pars
 
@@ -78,14 +131,24 @@ for i = 1:n
     V{i} = zeros(nodes, found);
     for j = 1:found
         for k = 1:nodes
-            V{i}(k, j) = G{indices{i}(j)}.nodesizes(node_indices{i}(k, j));
+            pdivide = 1;
+            i
+            size(subg)
+            k
+            size(subg{i}.nodelabels)
+            if subg{i}.nodelabels(k) == pind
+                pdivide = planestd;
+            elseif subg{i}.nodelabels(k) == cind
+                pdivide = cylinderstd;
+            end
+            V{i}(k, j) = G{indices{i}(j)}.nodesizes(node_indices{i}(k, j))/pdivide;
         end
     end
 end
 
 %% Show all the partitioned clouds for one extracted graph
 
-ind = 18;
+ind = 8;
 
 m = length(indices{ind});
 for i = 1:m
@@ -99,6 +162,7 @@ end
 
 i = 1;
 while i < n
+    i
     connected = connected_components(V{i}, 0.2);
     maxc = 0;
     p = [];
@@ -108,7 +172,7 @@ while i < n
             maxc = length(p);
         end
     end
-    if maxc < 10
+    if maxc < 5
         subg(i) = [];
         count(i) = [];
         GY(:, i) = [];

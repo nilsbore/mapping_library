@@ -38,32 +38,6 @@ for i = 1:n
     pause
 end
 
-%% Show distribution of plane and cylinder sizes
-
-m = length(G);
-
-planesizes = [];
-cylindersizes = [];
-
-p = primitives;
-pind = cellfind(p, 'Plane');
-cind = cellfind(p, 'Cylinder');
-
-for i = 1:m
-    ll = G{i}.nodelabels;
-    for j = 1:length(ll)
-       if ll(j) == pind
-           planesizes = [planesizes G{i}.nodesizes(j)];
-       elseif ll(j) == cind
-           cylindersizes = [cylindersizes G{i}.nodesizes(j)];
-       end
-    end
-end
-
-hist(planesizes, 30)
-figure
-hist(cylindersizes, 30)
-
 %% Convert the positions to the map coordinate system
 
 P = positions(:, 1:2)';

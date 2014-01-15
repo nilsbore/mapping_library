@@ -13,7 +13,11 @@ end
 
 for i = 1:length(G.edges)
     v = G.edges(i, :);
-    fprintf(fid, '%d--%d[label="%f"];\n', v(1)-1, v(2)-1, v(3));
+    fprintf(fid, '%d--%d[label="%f"]', v(1)-1, v(2)-1, v(3));
+    if v(3) > 3
+       fprintf(fid, '[style="dashed"]'); 
+    end
+    fprintf(fid, ';\n');
 end
 
 fprintf(fid, '}');
