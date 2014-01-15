@@ -92,6 +92,16 @@ indices(i:end) = [];
 node_indices(i:end) = [];
 n = length(subg);
 
+%% Save the frequent subgraphs
+
+freqfile = [graph_folder 'matsubgraphs.mat'];
+save(freqfile, 'subg', 'count', 'GY', 'indices', 'node_indices');
+
+%% Load the frequent subgraphs
+
+freqfile = [graph_folder 'matsubgraphs.mat'];
+load(freqfile)
+n = length(subg);
 
 %% Show distribution of plane and cylinder sizes
 
