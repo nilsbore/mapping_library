@@ -55,7 +55,7 @@ P = P - minp*ones(1, l);
 P = P.*(([n; m]./dist)*ones(1, l));
 
 % this is just a heuristic to find a transformation that looks good
-P = (P + [110; -100]*ones(1, l)).*([0.75; 0.47]*ones(1, l))  + [7; 140]*ones(1, l);
+P = (P + [-311; -272]*ones(1, l)).*([0.75;0.45]*ones(1, l))  + [323; 220]*ones(1, l);
 
 imshow(map)
 hold on
