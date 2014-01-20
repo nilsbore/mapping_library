@@ -4,9 +4,22 @@
 #include <pcl/visualization/pcl_visualizer.h>
 #include <pcl/filters/passthrough.h>
 
+std::string screenshotfile;
+
+void keyboardEventOccurred (const pcl::visualization::KeyboardEvent &event,
+                            void* viewer_void)
+{
+    pcl::visualization::PCLVisualizer* viewer = static_cast<pcl::visualization::PCLVisualizer*>(viewer_void);
+    if (event.getKeySym () == "p" && event.keyDown ())
+    {
+        std::cout << "p was pressed => saving screenshot" << std::endl;
+        viewer->saveScreenshot(screenshotfile);
+    }
+}
+
 int main(int argc, char** argv)
 {
-    if (argc < 4) {
+    if (argc < 5) {
         std::cout << "Please supply the PCD file and index file you want to display..."  << argc << std::endl;
         return 0;
     }
@@ -14,6 +27,7 @@ int main(int argc, char** argv)
     std::string pcdfile(argv[1]);
     std::string indexfile(argv[2]);
     std::string ordering(argv[3]);
+    screenshotfile = std::string(argv[4]);
 
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>());
     if (pcl::io::loadPCDFile<pcl::PointXYZRGB> (pcdfile, *cloud) == -1)
@@ -75,6 +89,7 @@ int main(int argc, char** argv)
     viewer.addPointCloud<pcl::PointXYZRGB>(filtered_cloud, rgb, "cloud");
     viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE,
                                              1, "cloud");
+    viewer.registerKeyboardCallback(keyboardEventOccurred, (void*)&viewer);
     while (!viewer.wasStopped())
     {
         viewer.spinOnce(100);

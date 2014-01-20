@@ -36,11 +36,15 @@ while true
    else
        k = findstr(tline, '[style="dashed"]');
        adjacent = isempty(k);
+       areplanes = G.nodelabels(from) == planeind && G.nodelabels(to) == planeind;
        n = regexp(tline, pat2, 'names')
        angle = str2double(n.angle);
        from = str2num(n.from) + 1;
        to = str2num(n.to) + 1;
-       if adjacent && G.nodelabels(from) == planeind && G.nodelabels(to) == planeind
+       if areplanes
+           G.edgeangles = [G.edgeangles; angle];
+       end
+       if adjacent && areplanes
            if abs(angle - pi/2) < alpha
                G.edges = [G.edges; uint32(zeros(1, 3))];
                G.edges(end, 1) = from;
@@ -59,7 +63,6 @@ while true
            else
                continue
            end
-           G.edgeangles = [G.edgeangles; angle]
        else
            if abs(angle - 0) < alpha
                G.edges = [G.edges; uint32(zeros(1, 3))];

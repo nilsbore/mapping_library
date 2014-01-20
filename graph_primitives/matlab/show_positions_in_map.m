@@ -35,8 +35,6 @@ Q = Q.*(([n; m]./dist)*ones(1, l));
 % this is just a heuristic to find a transformation that looks good
 Q = (Q + [110; -100]*ones(1, l)).*([0.75; 0.47]*ones(1, l))  + [7; 140]*ones(1, l);
 
-plot(Q(1, :), Q(2, :), 'o', 'MarkerSize', 6, 'MarkerFaceColor', 'b')
-
 %angle = atan(); % offset through focal length
 len = 17*horizon*326/566;
 
@@ -54,5 +52,7 @@ for j = 1:l
     y(3) = P(2, j) - o(2);
     fill(x, y, 'r', 'FaceAlpha', 0.15, 'EdgeAlpha', 0)
 end
+
+plot(Q(1, :), Q(2, :), 'o', 'MarkerSize', 6, 'MarkerFaceColor', 'b')
 
 end

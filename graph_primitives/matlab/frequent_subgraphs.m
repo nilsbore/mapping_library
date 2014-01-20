@@ -49,12 +49,12 @@ load(mapfile)
 %% Run the basic gspan analysis
 
 min_nodes = 4;
-[subg, count, GY, indices, node_indices] = gspan(G, 15, [min_nodes 0]);
+[subg, count, GY, indices, node_indices] = gspan(G, 30, [min_nodes 0]);
 n = length(subg);
 
 %% Filter base on number of edges
 
-min_edges = 5;
+min_edges = 4;
 assign_index = 1;
 lensubg = length(subg);
 
@@ -131,6 +131,8 @@ hist(cylindersizes, 30)
 
 planestd = std(planesizes)
 cylinderstd = std(cylindersizes)
+planemean = mean(planesizes);
+cylindermean = mean(cylindersizes);
 
 %% Construct the vector spaces over continuous node pars
 
@@ -142,30 +144,36 @@ for i = 1:n
     for j = 1:found
         for k = 1:nodes
             pdivide = 1;
+            pmin = 0;
             i
             size(subg)
             k
             size(subg{i}.nodelabels)
             if subg{i}.nodelabels(k) == pind
                 pdivide = planestd;
+                pmin = planemean;
             elseif subg{i}.nodelabels(k) == cind
                 pdivide = cylinderstd;
+                pmin = cylindermean;
             end
-            V{i}(k, j) = G{indices{i}(j)}.nodesizes(node_indices{i}(k, j))/pdivide;
+            V{i}(k, j) = (G{indices{i}(j)}.nodesizes(node_indices{i}(k, j))-pmin)/pdivide;
         end
     end
 end
 
 %% Show all the partitioned clouds for one extracted graph
 
-ind = 8;
+ind = 7;
+screenshot_folder = [graph_folder sprintf('%.6d/', ind)];
+mkdir(screenshot_folder)
 
 m = length(indices{ind});
 for i = 1:m
     fileind = indices{ind}(i) - 1;
     index = [graph_folder sprintf('indices%.6d.txt', fileind)]
     pcdfile = [data_folder sprintf('cloud%.6d.pcd', fileind)]
-    display_graph(pcdfile, index, node_indices{ind}(:, i), length(G{fileind+1}.nodelabels));
+    screenshot = [screenshot_folder sprintf('graph%.6d.png', fileind)]
+    display_graph(pcdfile, index, screenshot, node_indices{ind}(:, i), length(G{fileind+1}.nodelabels));
 end
 
 %% Find connected components

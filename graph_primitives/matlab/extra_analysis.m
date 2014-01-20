@@ -9,7 +9,9 @@ for i = 1:m
     end
 end
 
-hist(A, 100);
+hist(A, 1000);
+
+%% Show the histogram of all angles
 
 %% Check that the correct indices are found
 
