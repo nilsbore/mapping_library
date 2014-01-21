@@ -44,18 +44,10 @@ end
 
 P = positions(:, 1:2)';
 P(2, :) = -P(2, :);
-minp = min(P, [], 2);
-maxp = max(P, [], 2);
-
-[m, n] = size(map);
-dist = maxp - minp;
-
 l = length(P);
-P = P - minp*ones(1, l);
-P = P.*(([n; m]./dist)*ones(1, l));
 
 % this is just a heuristic to find a transformation that looks good
-P = (P + [-311; -272]*ones(1, l)).*([0.75;0.45]*ones(1, l))  + [323; 220]*ones(1, l);
+P = 20*P + [318; 267]*ones(1, l);
 
 imshow(map)
 hold on
