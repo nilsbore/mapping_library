@@ -16,8 +16,9 @@ end
 
 m = length(r) - 1;
 components = cell(1, m);
+[~, I] = sort(diff(r), 'descend');
 for i = 1:m
-    components{i} = p(r(i):r(i+1)-1);
+    components{i} = p(r(I(i)):r(I(i)+1)-1);
 end
 
 end

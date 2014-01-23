@@ -22,6 +22,7 @@ private:
     Eigen::ArrayXi level_scores; // the sum of the number of primitives at each level of the octree
     //Eigen::VectorXd level_pdf;
     std::vector<base_primitive*> candidates; // candidates for new primitives
+    int number_extracted; // number of primitives extracted, used for colors
 
     std::vector<base_primitive*>& primitives; // primitive types used
 

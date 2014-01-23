@@ -96,6 +96,7 @@ void primitive_extractor::estimate_normals()
 
 void primitive_extractor::extract(std::vector<base_primitive*>& extracted)
 {
+    number_extracted = 0; // set numbers extracted to zero again
     extracted.clear(); // extracted primitives
     int counter; // to use where we need it
 
@@ -262,11 +263,14 @@ void primitive_extractor::remove_points_from_cloud(base_primitive* p)
         vis->lock();
     }
 
-    p->red = 0;
-    p->green = 0;
-    p->blue = 0;
+    int colormap[6][3] = {{255, 0, 0}, {0, 255, 0}, {0, 0, 255}, {255, 0, 255}, {255, 255, 0}, {64, 224, 208}};
+    int r = number_extracted % 6;
+    p->red = colormap[r][0];
+    p->green = colormap[r][1];
+    p->blue = colormap[r][2];
+    ++number_extracted;
 
-    int r = rand() % 5;
+    /*int r = rand() % 6;
     if (r == 0) {
         p->green = 255;
     }
@@ -283,7 +287,7 @@ void primitive_extractor::remove_points_from_cloud(base_primitive* p)
     }
     else {
         p->blue = 255;
-    }
+    }*/
 
     /*switch (p->get_shape()) {
     case base_primitive::PLANE:

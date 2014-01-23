@@ -1,4 +1,4 @@
-function status = display_graph(pcdfile, index, indices, nodes)
+function status = display_graph(pcdfile, index, screenshot, indices, nodes)
 
 viewer = '../bin/display_graph';
 
@@ -14,7 +14,7 @@ for j = 1:nodes
     os = [os ' ' num2str(ordering(j))];
 end
 os = [os '"'];
-status = system([viewer ' "' pcdfile '" "' index '" ' os], '-echo');
+status = system([viewer ' "' pcdfile '" "' index '" ' os ' "' screenshot '"'], '-echo');
 
 setenv('LD_LIBRARY_PATH', ld_path);
 

@@ -67,7 +67,7 @@ while counter < n %i <= lensubg
     faredges = sum(subg{counter}.edges(:, 3) > 3);%size(subg{i}.edges, 1) - adjedges;
     m = length(subg{counter}.nodelabels);
     maxedges = m*(m - 1)/2;
-    if (adjedges < min_edges) || (faredges +  adjedges < maxedges)
+    if (adjedges < min_edges) || (faredges < maxedges)
         %subg(i) = [];
         %count(i) = [];
         %GY(:, i) = [];
@@ -107,6 +107,15 @@ n = length(subg);
 
 m = length(G);
 
+for i = 1:m
+    ll = G{i}.nodelabels;
+    for j = 1:length(ll)
+       if ll(j) == pind
+           G{i}.nodesizes(j) = log(0.2 + G{i}.nodesizes(j));
+       end
+    end
+end
+
 planesizes = [];
 cylindersizes = [];
 
@@ -145,26 +154,30 @@ for i = 1:n
         for k = 1:nodes
             pdivide = 1;
             pmin = 0;
-            i
-            size(subg)
-            k
-            size(subg{i}.nodelabels)
+            psize = G{indices{i}(j)}.nodesizes(node_indices{i}(k, j));
             if subg{i}.nodelabels(k) == pind
                 pdivide = planestd;
                 pmin = planemean;
+                psize = log(0.2 + psize);
             elseif subg{i}.nodelabels(k) == cind
                 pdivide = cylinderstd;
                 pmin = cylindermean;
             end
-            V{i}(k, j) = (G{indices{i}(j)}.nodesizes(node_indices{i}(k, j))-pmin)/pdivide;
+            V{i}(k, j) = (psize - pmin)/pdivide;
         end
     end
 end
 
+%% Cluster the graphs
+
+[subg, count, GY, indices, node_indices] = ...
+    cluster_graphs(subg, count, GY, indices, node_indices, V, false);
+n = length(subg);
+
 %% Show all the partitioned clouds for one extracted graph
 
-ind = 7;
-screenshot_folder = [graph_folder sprintf('%.6d/', ind)];
+ind = 9;
+screenshot_folder = [graph_folder sprintf('clustered%.6d/', ind)];
 mkdir(screenshot_folder)
 
 m = length(indices{ind});
@@ -172,9 +185,23 @@ for i = 1:m
     fileind = indices{ind}(i) - 1;
     index = [graph_folder sprintf('indices%.6d.txt', fileind)]
     pcdfile = [data_folder sprintf('cloud%.6d.pcd', fileind)]
-    screenshot = [screenshot_folder sprintf('graph%.6d.png', fileind)]
+    screenshot = [screenshot_folder sprintf('graph%.6d_%.3d.png', fileind, i)]
     display_graph(pcdfile, index, screenshot, node_indices{ind}(:, i), length(G{fileind+1}.nodelabels));
 end
+
+%% Save the places in the map
+
+for i = 1:n
+    screenshot_folder = [graph_folder sprintf('clustered%.6d/', i)];
+    posmap = show_positions_in_map(map, i, indices, positions);
+    posmapfile = [screenshot_folder 'posmap.png'];
+    imwrite(posmap, posmapfile, 'PNG');
+end
+
+%% Find largest cluster within the graphs
+
+[subg, count, GY, indices, node_indices] = ...
+    cluster_graphs(subg, count, GY, indices, node_indices, V, false);
 
 %% Find connected components
 
