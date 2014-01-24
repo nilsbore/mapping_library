@@ -1,4 +1,4 @@
-function show_positions_in_map(map, inds, indices, positions)
+function show_positions_in_map(map, inds, indices, positions, filename)
 
 tangle = -12;
 scaling = 20;
@@ -13,7 +13,7 @@ midy = 187;
 tangle = pi/180*tangle;
 R = [cos(tangle) -sin(tangle); sin(tangle) cos(tangle)];
 
-figure
+h = figure;
 imshow(map);
 hold on
 
@@ -56,6 +56,10 @@ for i = inds
     end
 
     plot(Q(1, :), Q(2, :), 'o', 'MarkerSize', 4, 'MarkerFaceColor', 'b')
+end
+
+if nargin > 4
+    saveas(h, filename, 'epsc');
 end
 
 end

@@ -191,11 +191,17 @@ end
 
 %% Save the places in the map
 
+savemap = true; % change to false if you just want to view maps
+
 for i = 1:n
     screenshot_folder = [graph_folder sprintf('clustered%.6d/', i)];
-    posmap = show_positions_in_map(map, i, indices, positions);
-    posmapfile = [screenshot_folder 'posmap.png'];
-    imwrite(posmap, posmapfile, 'PNG');
+    posmapfile = [screenshot_folder 'posmap.eps'];
+    if savemap
+        show_positions_in_map(map, i, indices, positions, posmapfile);
+    else
+        show_positions_in_map(map, i, indices, positions);
+        pause
+    end
 end
 
 %% Find largest cluster within the graphs
