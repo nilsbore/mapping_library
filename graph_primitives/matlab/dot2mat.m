@@ -65,15 +65,42 @@ while true
            end
        else
            if abs(angle - 0) < alpha
-               G.edges = [G.edges; uint32(zeros(1, 3))];
-               G.edges(end, 1) = from;
-               G.edges(end, 2) = to;
-               G.edges(end, 3) = 1;
+               if areplanes % distant parallell planes
+                   fromn = G.nodedata(from, 1:3)';
+                   fromd = G.nodedata(from, 4);
+                   ton = G.nodedata(to, 1:3)';
+                   tod = G.nodedata(to, 4);
+                   if fromd < 0
+                       fromn = -fromn;
+                       fromd = -fromd;
+                   end
+                   if tod < 0
+                       ton = -ton;
+                       tod = -tod;
+                   end
+                   G.edges = [G.edges; uint32(zeros(1, 3))];
+                   G.edges(end, 1) = from;
+                   G.edges(end, 2) = to;
+                   if fromn'*ton < 0 % facing
+                       G.edges(end, 3) = 2;
+                   else % parallell
+                       if abs(-tod/ton(3)+fromd/fromn(3)) < 0.2 % distance of planes
+                           G.edges(end, 3) = 3;
+                       else
+                           G.edges(end, 3) = 4;
+                       end
+                   end
+               else
+                   G.edges = [G.edges; uint32(zeros(1, 3))];
+                   G.edges(end, 1) = from;
+                   G.edges(end, 2) = to;
+                   G.edges(end, 3) = 2;
+               end
            elseif abs(angle - pi/2) < alpha
                G.edges = [G.edges; uint32(zeros(1, 3))];
                G.edges(end, 1) = from;
                G.edges(end, 2) = to;
-               G.edges(end, 3) = 2;
+               G.edges(end, 3) = 1;
            else
                continue
            end

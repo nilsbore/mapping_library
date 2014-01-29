@@ -9,6 +9,10 @@ for i = 1:l
     G{i} = dot2mat(di);
 end
 
+for i = 1:l
+    %G{i} = filter_sizes(G{i});
+end
+
 filename = [graph_folder filename];
 save(filename, 'G')
 

@@ -3,10 +3,10 @@
 % modify these variables to point to folders on your filesystem
 
 % path to folder where it finds the pcd files
-data_folder = '/home/nbore/Data/primitive2/pcd/';
+data_folder = '/home/nbore/Data/doorclosed/';
 
 % path to folder to save the dot and index files
-graph_folder = '/home/nbore/Workspace/mapping_library/graph_primitives/graphs/dot_graphs2/';
+graph_folder = '/home/nbore/Workspace/mapping_library/graph_primitives/graphs/doorclosed/';
 
 % add the gspan command
 addpath '../gboost-0.1.1/bin';
@@ -43,18 +43,30 @@ load(graphfile)
 
 posfile = [graph_folder 'positions.mat'];
 load(posfile)
-mapfile = [graph_folder 'map.mat'];
-load(mapfile)
+%mapfile = [graph_folder 'map.mat'];
+%load(mapfile)
+map = imread('/home/nbore/Data/primitive2/pcd/floorsix.pgm');
 
 %% Run the basic gspan analysis
 
-min_nodes = 4;
-[subg, count, GY, indices, node_indices] = gspan(G, 30, [min_nodes 0]);
+min_nodes = 5;
+[subg, count, GY, indices, node_indices] = gspan(G, 4, [min_nodes 5]);
+n = length(subg);
+
+%% Save the temp subgraphs
+
+freqfile = [graph_folder 'temp.mat'];
+save(freqfile, 'subg', 'count', 'GY', 'indices', 'node_indices');
+
+%% Load the temp subgraphs
+
+freqfile = [graph_folder 'temp.mat'];
+load(freqfile)
 n = length(subg);
 
 %% Filter base on number of edges
 
-min_edges = 4;
+min_edges = 2;
 assign_index = 1;
 lensubg = length(subg);
 
@@ -67,7 +79,7 @@ while counter < n %i <= lensubg
     faredges = sum(subg{counter}.edges(:, 3) > 3);%size(subg{i}.edges, 1) - adjedges;
     m = length(subg{counter}.nodelabels);
     maxedges = m*(m - 1)/2;
-    if (adjedges < min_edges) || (faredges < maxedges)
+    if (adjedges < min_edges) || (faredges + adjedges < maxedges)
         %subg(i) = [];
         %count(i) = [];
         %GY(:, i) = [];
@@ -107,14 +119,14 @@ n = length(subg);
 
 m = length(G);
 
-for i = 1:m
-    ll = G{i}.nodelabels;
-    for j = 1:length(ll)
-       if ll(j) == pind
-           G{i}.nodesizes(j) = log(0.2 + G{i}.nodesizes(j));
-       end
-    end
-end
+% for i = 1:m
+%     ll = G{i}.nodelabels;
+%     for j = 1:length(ll)
+%        if ll(j) == pind
+%            G{i}.nodesizes(j) = log(0.2 + G{i}.nodesizes(j));
+%        end
+%     end
+% end
 
 planesizes = [];
 cylindersizes = [];
@@ -127,7 +139,8 @@ for i = 1:m
     ll = G{i}.nodelabels;
     for j = 1:length(ll)
        if ll(j) == pind
-           planesizes = [planesizes G{i}.nodesizes(j)];
+           planesizes = [planesizes log(0.2 + G{i}.nodesizes(j))];
+           %planesizes = [planesizes G{i}.nodesizes(j)];
        elseif ll(j) == cind
            cylindersizes = [cylindersizes G{i}.nodesizes(j)];
        end
@@ -171,12 +184,12 @@ end
 %% Cluster the graphs
 
 [subg, count, GY, indices, node_indices] = ...
-    cluster_graphs(subg, count, GY, indices, node_indices, V, false);
+    cluster_graphs(subg, count, GY, indices, node_indices, V, true);
 n = length(subg);
 
 %% Show all the partitioned clouds for one extracted graph
 
-ind = 9;
+ind = 1;
 screenshot_folder = [graph_folder sprintf('clustered%.6d/', ind)];
 mkdir(screenshot_folder)
 
@@ -191,27 +204,32 @@ end
 
 %% Save the places in the map
 
-savemap = true; % change to false if you just want to view maps
+savemap = false; % change to false if you just want to view maps
 
-for i = 1:n
+%highlight = [25 50 100];
+%highlight = [30 50 70];
+%highlight = [25 53 82]; % for rest
+highlight = [25 50 82]; % for 2
+
+for i = 1:4
     screenshot_folder = [graph_folder sprintf('clustered%.6d/', i)];
     posmapfile = [screenshot_folder 'posmap.eps'];
     if savemap
-        show_positions_in_map(map, i, indices, positions, posmapfile);
+        show_positions_in_map(map, i, indices, positions, [], posmapfile);
     else
-        show_positions_in_map(map, i, indices, positions);
+        show_positions_in_map(map, i, indices, positions, []);
         pause
     end
 end
 
 %% Find largest cluster within the graphs
 
-[subg, count, GY, indices, node_indices] = ...
-    cluster_graphs(subg, count, GY, indices, node_indices, V, false);
+%[subg, count, GY, indices, node_indices] = ...
+cluster_graphs(subg, count, GY, indices, node_indices, V, true);
 
 %% Find connected components
 
-i = 1;
+i = 10;
 while i < n
     i
     connected = connected_components(V{i}, 0.2);
@@ -249,7 +267,7 @@ end
 for i = 1:n
     i
     filename = [graph_folder 'subg' sprintf('%.6d', i-1) '.dot'];
-    system(['dot -Tpng ' filename ' > ' graph_folder 'test.png']);
-    system(['gvfs-open ' graph_folder 'test.png']);
+    system(['dot -Teps ' filename ' > ' graph_folder 'test.eps']);
+    system(['gvfs-open ' graph_folder 'test.eps']);
     pause
 end

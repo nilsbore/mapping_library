@@ -29,7 +29,7 @@ for i = 1:n
     end
 end
 
-%% Show an eigen analysis of the clustering problem
+%% Show an eigen analysis of the clustering problem,
 
 for i = 1:n
     vim = mean(V{i}, 2);
@@ -52,3 +52,6 @@ P = 20*P + [318; 267]*ones(1, l);
 imshow(map)
 hold on
 plot(P(1, :), P(2, :), '*r', 'MarkerSize', 2)
+
+%% Cluster the graphs based on maximum cluster
+

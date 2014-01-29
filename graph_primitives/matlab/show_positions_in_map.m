@@ -1,4 +1,4 @@
-function show_positions_in_map(map, inds, indices, positions, filename)
+function show_positions_in_map(map, inds, indices, positions, highlight, filename)
 
 tangle = -12;
 scaling = 20;
@@ -17,6 +17,7 @@ h = figure;
 imshow(map);
 hold on
 
+%counter = 1;
 for i = inds
     P = positions(indices{i}, 1:2)';
     P(2, :) = -P(2, :);
@@ -43,6 +44,9 @@ for i = inds
     x = zeros(1, 3);
     y = zeros(1, 3);
     for j = 1:l
+        if find(highlight == j)
+            continue
+        end
         o = P(:, j) - Q(:, j);
         o = [o(2); -o(1)];
         o = len/norm(o)*o;
@@ -52,13 +56,31 @@ for i = inds
         y(2) = P(2, j) + o(2);
         x(3) = P(1, j) - o(1);
         y(3) = P(2, j) - o(2);
-        fill(x, y, 'r', 'FaceAlpha', 0.15, 'EdgeAlpha', 0)
+        fillcolor = 'r';
+        fillalpha = 0.05;
+        fill(x, y, fillcolor, 'FaceAlpha', fillalpha, 'EdgeAlpha', 0)
+    end
+    
+    for j = highlight
+        o = P(:, j) - Q(:, j);
+        o = [o(2); -o(1)];
+        o = len/norm(o)*o;
+        x(1) = Q(1, j);
+        y(1) = Q(2, j);
+        x(2) = P(1, j) + o(1);
+        y(2) = P(2, j) + o(2);
+        x(3) = P(1, j) - o(1);
+        y(3) = P(2, j) - o(2);
+        fillcolor = 'b';
+        fillalpha = 0.2;
+        fill(x, y, fillcolor, 'FaceAlpha', fillalpha, 'EdgeAlpha', 1)
     end
 
     plot(Q(1, :), Q(2, :), 'o', 'MarkerSize', 4, 'MarkerFaceColor', 'b')
+    %counter = counter + 1;
 end
 
-if nargin > 4
+if nargin > 5
     saveas(h, filename, 'epsc');
 end
 

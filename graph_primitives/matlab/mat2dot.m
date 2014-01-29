@@ -6,14 +6,16 @@ fprintf(fid, 'graph G {\n');
 p = primitives;
 shapes = {'box', 'ellipse', 'ellipse'};
 
+colors = {'#ff0000', '#00ff00', '#0000ff', '#ff00ff', '#ffff00'};
+
 for i = 1:length(G.nodelabels)
     v = G.nodelabels(i);
-    fprintf(fid, '%d[label="%s"][shape="%s"];\n', i-1, p{v}, shapes{v});
+    fprintf(fid, '%d[label="%s"][shape="%s"][style="filled"][fillcolor="%s"];\n', i-1, p{v}, shapes{v}, colors{i});
 end
 
 for i = 1:length(G.edges)
     v = G.edges(i, :);
-    fprintf(fid, '%d--%d[label="%f"]', v(1)-1, v(2)-1, v(3));
+    fprintf(fid, '%d--%d[label="%d"]', v(1)-1, v(2)-1, v(3));
     if v(3) > 3
        fprintf(fid, '[style="dashed"]'); 
     end
