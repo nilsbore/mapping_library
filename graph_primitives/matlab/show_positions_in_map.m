@@ -57,7 +57,7 @@ for i = inds
         x(3) = P(1, j) - o(1);
         y(3) = P(2, j) - o(2);
         fillcolor = 'r';
-        fillalpha = 0.05;
+        fillalpha = 0.25;
         fill(x, y, fillcolor, 'FaceAlpha', fillalpha, 'EdgeAlpha', 0)
     end
     

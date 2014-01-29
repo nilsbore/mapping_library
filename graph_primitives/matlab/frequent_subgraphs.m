@@ -3,10 +3,10 @@
 % modify these variables to point to folders on your filesystem
 
 % path to folder where it finds the pcd files
-data_folder = '/home/nbore/Data/doorclosed/';
+data_folder = '/home/nbore/Data/primitiveall/';
 
 % path to folder to save the dot and index files
-graph_folder = '/home/nbore/Workspace/mapping_library/graph_primitives/graphs/doorclosed/';
+graph_folder = '/home/nbore/Workspace/mapping_library/graph_primitives/graphs/graphsall/';
 
 % add the gspan command
 addpath '../gboost-0.1.1/bin';
@@ -66,7 +66,7 @@ n = length(subg);
 
 %% Filter base on number of edges
 
-min_edges = 2;
+min_edges = 3;
 assign_index = 1;
 lensubg = length(subg);
 
@@ -189,7 +189,7 @@ n = length(subg);
 
 %% Show all the partitioned clouds for one extracted graph
 
-ind = 1;
+ind = 2;
 screenshot_folder = [graph_folder sprintf('clustered%.6d/', ind)];
 mkdir(screenshot_folder)
 
@@ -211,7 +211,7 @@ savemap = false; % change to false if you just want to view maps
 %highlight = [25 53 82]; % for rest
 highlight = [25 50 82]; % for 2
 
-for i = 1:4
+for i = 1:3
     screenshot_folder = [graph_folder sprintf('clustered%.6d/', i)];
     posmapfile = [screenshot_folder 'posmap.eps'];
     if savemap
