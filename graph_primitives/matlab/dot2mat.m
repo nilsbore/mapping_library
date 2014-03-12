@@ -1,5 +1,7 @@
 function G = dot2mat(filename)
 
+global anglehist
+
 fid = fopen(filename);
 G = {};
 G.edges = uint32([]);
@@ -45,6 +47,7 @@ while true
            G.edgeangles = [G.edgeangles; angle];
        end
        if adjacent && areplanes
+           anglehist = [anglehist angle];
            if abs(angle - pi/2) < alpha
                G.edges = [G.edges; uint32(zeros(1, 3))];
                G.edges(end, 1) = from;

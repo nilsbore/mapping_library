@@ -1,5 +1,9 @@
 function convert_graphs(graph_folder, filename)
 
+global anglehist
+
+anglehist = [];
+
 G = {};
 
 listing = dir([graph_folder 'graph*.dot']);
@@ -15,5 +19,7 @@ end
 
 filename = [graph_folder filename];
 save(filename, 'G')
+
+hist(180/pi*anglehist, 50)
 
 end

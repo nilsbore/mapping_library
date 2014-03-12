@@ -6,7 +6,7 @@ fprintf(fid, 'graph G {\n');
 p = primitives;
 shapes = {'box', 'ellipse', 'ellipse'};
 
-colors = {'#ff0000', '#00ff00', '#0000ff', '#ff00ff', '#ffff00'};
+colors = {'#ff0000', '#00ff00', '#0000ff', '#ff00ff', '#ffff00', '#00ffff'};
 
 for i = 1:length(G.nodelabels)
     v = G.nodelabels(i);

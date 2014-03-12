@@ -1,6 +1,6 @@
 function status = display_graph(pcdfile, index, screenshot, indices, nodes)
 
-viewer = '../bin/display_graph';
+viewer = 'optirun ../bin/display_graph';
 
 ld_path = getenv('LD_LIBRARY_PATH');
 setenv('LD_LIBRARY_PATH', '/opt/ros/groovy/lib');

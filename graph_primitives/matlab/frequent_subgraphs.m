@@ -49,24 +49,25 @@ map = imread('/home/nbore/Data/primitive2/pcd/floorsix.pgm');
 
 %% Run the basic gspan analysis
 
-min_nodes = 5;
-[subg, count, GY, indices, node_indices] = gspan(G, 4, [min_nodes 5]);
+min_nodes = 6;
+% 26 for five?
+[subg, count, GY, indices, node_indices] = gspan(G, 15, [min_nodes 6]);
 n = length(subg);
 
 %% Save the temp subgraphs
 
-freqfile = [graph_folder 'temp.mat'];
+freqfile = [graph_folder 'temp6.mat'];
 save(freqfile, 'subg', 'count', 'GY', 'indices', 'node_indices');
 
 %% Load the temp subgraphs
 
-freqfile = [graph_folder 'temp.mat'];
+freqfile = [graph_folder 'temp5.mat'];
 load(freqfile)
 n = length(subg);
 
 %% Filter base on number of edges
 
-min_edges = 3;
+min_edges = 15;
 assign_index = 1;
 lensubg = length(subg);
 
@@ -106,7 +107,7 @@ n = length(subg);
 
 %% Save the frequent subgraphs
 
-freqfile = [graph_folder 'matsubgraphs.mat'];
+freqfile = [graph_folder 'matsubgraphs5.mat'];
 save(freqfile, 'subg', 'count', 'GY', 'indices', 'node_indices');
 
 %% Load the frequent subgraphs
@@ -114,6 +115,25 @@ save(freqfile, 'subg', 'count', 'GY', 'indices', 'node_indices');
 freqfile = [graph_folder 'matsubgraphs.mat'];
 load(freqfile)
 n = length(subg);
+
+%% Remove double counts with nodes representing the same structure
+
+for i = 1:n
+    keep_inds = [];
+    unique_inds = unique(indices{i});
+    for j = 1:length(unique_inds)
+        ind = find(indices{i} == unique_inds(j));
+        if length(ind) == 1
+            keep_inds = [keep_inds ind];
+            continue
+        end
+        A = sort(node_indices{i}(:, ind), 1, 'ascend');
+        [~, I] = unique(A', 'rows', 'first');
+        keep_inds = [keep_inds ind(I)];
+    end
+    indices{i} = indices{i}(keep_inds);
+    node_indices{i} = node_indices{i}(:, keep_inds);
+end
 
 %% Show distribution of plane and cylinder sizes
 
@@ -189,7 +209,7 @@ n = length(subg);
 
 %% Show all the partitioned clouds for one extracted graph
 
-ind = 2;
+ind = 1;
 screenshot_folder = [graph_folder sprintf('clustered%.6d/', ind)];
 mkdir(screenshot_folder)
 
@@ -204,14 +224,14 @@ end
 
 %% Save the places in the map
 
-savemap = false; % change to false if you just want to view maps
+savemap = true; % change to false if you just want to view maps
 
 %highlight = [25 50 100];
 %highlight = [30 50 70];
 %highlight = [25 53 82]; % for rest
 highlight = [25 50 82]; % for 2
 
-for i = 1:3
+for i = 1:n
     screenshot_folder = [graph_folder sprintf('clustered%.6d/', i)];
     posmapfile = [screenshot_folder 'posmap.eps'];
     if savemap

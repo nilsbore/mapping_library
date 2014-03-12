@@ -61,14 +61,14 @@ int main(int argc, char** argv)
         std::cout << "Processing " << file << "..." << std::endl;
         if (cloud->size() == 0) {
             // just write an empty dot file
-
+            
         }
 
         primitive_extractor pe(cloud, primitives, params, &viewer);
         viewer.cloud = pe.get_cloud();
         viewer.cloud_changed = true;
-        viewer.cloud_normals = pe.get_normals();
-        viewer.normals_changed = true;
+        //viewer.cloud_normals = pe.get_normals();
+        //viewer.normals_changed = true;
         std::vector<base_primitive*> extracted;
         pe.extract(extracted);
         if (extracted.empty()) {
@@ -87,15 +87,19 @@ int main(int argc, char** argv)
         ss << "/graph" << std::setfill('0') << std::setw(6) << counter << ".dot";
         std::cout << ss.str() << std::endl;
         std::string graphfile = graphdir + ss.str();
-        std::string imagefile = graphdir + "test.png";
+        //std::string imagefile = graphdir + "test.png";
         ge.generate_dot_file(graphfile);
-        std::string command = "dot -Tpng " + graphfile + " > " + imagefile;// + " && gvfs-open " + imagefile;
-        system(command.c_str());
+        //std::string command = "dot -Tpng " + graphfile + " > " + imagefile;// + " && gvfs-open " + imagefile;
+        //system(command.c_str());
 
         ss.str("");
         ss << "/indices" << std::setfill('0') << std::setw(6) << counter << ".txt";
         std::string indexfile = graphdir + ss.str();
         ge.generate_index_file(indexfile);
+
+        /*int dummy;
+        std::cout << "Press a key to continue..." << std::endl;
+        std::cin >> dummy;*/
 
         ++counter;
     }

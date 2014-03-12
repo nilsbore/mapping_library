@@ -49,7 +49,7 @@ bool cylinder_primitive::construct(const MatrixXd& points, const MatrixXd& norma
 
     r = (fabs(t(0)) + fabs(t(1)))/2.0;
 
-    if (r > max_radius || r < 0.05) {
+    if (r > max_radius || r < 0.07) {
         return false;
     }
 
@@ -152,7 +152,7 @@ int cylinder_primitive::inliers(const MatrixXd& points, const MatrixXd& normals,
     cv::reduce(support, row_support, 0, CV_REDUCE_SUM, CV_32SC1);
     int nonzero = cv::countNonZero(row_support);
 
-    if (double(nonzero)/double(height) < 0.25) { // make this a parameter
+    if (double(nonzero)/double(height) < 0.3) { // make this a parameter
         supporting_inds.clear();
         return 0;
     }

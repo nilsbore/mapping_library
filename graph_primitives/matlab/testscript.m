@@ -9,6 +9,7 @@ for ind = 1:4;
     label = 1 + double(mvnpdf(V{ind}', muhat, sigmahat) > sigma);
 
     colors = 'rgbmy';
+    vim = mean(V{ind}, 2);
     vi = V{ind} - vim*ones(1, size(V{ind}, 2));
     [U, S, VV] = svd(vi');
     vi = VV'*vi;
