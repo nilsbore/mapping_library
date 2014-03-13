@@ -1,19 +1,19 @@
 project(ransac_primitives)
 
-set(CMAKE_CXX_FLAGS "-O4 -g -Wall -fPIC -std=c++0x")
+set(CMAKE_CXX_FLAGS "-O4 -g -Wall -fPIC -std=c++0x -DNDEBUG")
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 # PCL
-set(PCL_DIR "/opt/ros/groovy/share/pcl-1.6")
-find_package(PCL 1.6 REQUIRED)
+set(PCL_DIR "/usr/share/pcl-1.7")
+find_package(PCL 1.7 REQUIRED)
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
 # OpenCV
-include_directories(/opt/ros/groovy/include/opencv2)
-link_directories(/opt/ros/groovy/lib)
+include_directories(/opt/ros/hydro/include)
+link_directories(/opt/ros/hydro/lib)
 
 # MAIN LIBRARY
 add_library(base_primitive src/base_primitive.cpp)

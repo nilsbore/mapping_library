@@ -11,6 +11,7 @@ class primitive_octree : public pcl::octree::OctreePointCloudSearch<pcl::PointXY
 public:
     typedef pcl::octree::OctreePointCloudSearch<pcl::PointXYZRGB, primitive_leaf> super;
     typedef super::OctreeT::BranchNode BranchNode;
+    typedef super::OctreeT::LeafNode primitive_leaf_node;
     typedef pcl::PointXYZRGB PointT;
     typedef int DataT;
 protected:

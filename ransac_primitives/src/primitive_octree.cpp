@@ -39,16 +39,21 @@ void primitive_octree::remove_point(int ind)
     this->genOctreeKeyforPoint(point, key);
 
     pcl::octree::OctreeNode* result = NULL;
-    find_node_recursive(key, depthMask_, rootNode_, result, 0);
+    find_node_recursive(key, depth_mask_, root_node_, result, 0);
     if (result == NULL) {
         return;
     }
 
-    primitive_leaf* leafNode = dynamic_cast<primitive_leaf*> (result);
+    pcl::octree::OctreeContainerEmpty* test = dynamic_cast<pcl::octree::OctreeContainerEmpty*> (result);
+    if (test != NULL) {
+        std::cout << "The container was empty!" << std::endl;
+    }
+
+    primitive_leaf_node* leafNode = dynamic_cast<primitive_leaf_node*> (result);
     if (leafNode != NULL) {
-        if (!leafNode->remove_if_equal(ind)) {
+        if (!leafNode->getContainer().remove_if_equal(ind)) {
             std::cout << "Couldn't remove point!" << std::endl;
-            //exit(0); // FIXME: this happened once in the big dataset for some reason
+            exit(0); // FIXME: this happened once in the big dataset for some reason
         }
     }
     else {
@@ -60,7 +65,7 @@ void primitive_octree::remove_point(int ind)
 void primitive_octree::find_points_at_depth(std::vector<DataT>& inds, const PointT& point, int depth)
 {
     if (depth == getTreeDepth()) {
-        serialize_node_recursive(rootNode_, &inds);
+        serialize_node_recursive(root_node_, &inds);
         return;
     }
 
@@ -70,7 +75,7 @@ void primitive_octree::find_points_at_depth(std::vector<DataT>& inds, const Poin
     this->genOctreeKeyforPoint(point, key);
 
     pcl::octree::OctreeNode* result = 0;
-    find_node_recursive(key, depthMask_, rootNode_, result, depth);
+    find_node_recursive(key, depth_mask_, root_node_, result, depth);
 
     if (result == NULL) {
         std::cout << "Is null!" << std::endl;
@@ -81,7 +86,8 @@ void primitive_octree::find_points_at_depth(std::vector<DataT>& inds, const Poin
     }
     else if (result->getNodeType() == pcl::octree::LEAF_NODE) {
         const LeafNode* childLeaf = static_cast<const LeafNode*>(result);
-        childLeaf->getData(inds);
+        //childLeaf->getData(inds);
+        childLeaf->getContainer().getPointIndices(inds);
     }
     else {
         std::cout << "Couldn't find node at required level." << std::endl;
@@ -94,7 +100,7 @@ void primitive_octree::find_potential_inliers(std::vector<DataT>& inds, base_pri
 {
     pcl::octree::OctreeKey newKey;
     unsigned int treeDepth_arg = 0;
-    serialize_inliers(rootNode_, newKey, treeDepth_arg, &inds, primitive, margin);
+    serialize_inliers(root_node_, newKey, treeDepth_arg, &inds, primitive, margin);
 }
 
 void primitive_octree::serialize_inliers(const BranchNode* branch_arg, pcl::octree::OctreeKey& key_arg,
@@ -148,7 +154,8 @@ void primitive_octree::serialize_inliers(const BranchNode* branch_arg, pcl::octr
                 const LeafNode* childLeaf = static_cast<const LeafNode*>(childNode);
 
                 if (dataVector_arg) {
-                    childLeaf->getData (*dataVector_arg);
+                    //childLeaf->getData (*dataVector_arg);
+                    childLeaf->getContainer().getPointIndices(*dataVector_arg);
                 }
 
                 break;
@@ -184,6 +191,7 @@ void primitive_octree::find_node_recursive(const pcl::octree::OctreeKey& key_arg
 
             if (depthMask_arg == 1 << depth) { // 2^depth
                 result_arg = childNode;
+                std::cout << "It happens in 1" << std::endl;
             }
             else {
                 find_node_recursive(key_arg, depthMask_arg / 2, childBranch, result_arg, depth);
@@ -193,6 +201,10 @@ void primitive_octree::find_node_recursive(const pcl::octree::OctreeKey& key_arg
         case pcl::octree::LEAF_NODE:
             // return existing leaf node
             result_arg = childNode;
+            std::cout << "It happens in 2" << std::endl;
+            break;
+        default:
+            std::cout << "Not branch or leaf node!" << std::endl;
             break;
         }
     }
@@ -230,7 +242,8 @@ void primitive_octree::serialize_node_recursive(const BranchNode* branch_arg, st
                 const LeafNode* childLeaf = static_cast<const LeafNode*>(childNode);
 
                 if (dataVector_arg) {
-                    childLeaf->getData (*dataVector_arg);
+                    //childLeaf->getData (*dataVector_arg);
+                    childLeaf->getContainer().getPointIndices(*dataVector_arg);
                 }
 
                 break;

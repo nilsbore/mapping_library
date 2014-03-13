@@ -6,7 +6,7 @@ primitive_leaf::primitive_leaf()
 {
 }
 
-primitive_leaf::primitive_leaf(const OctreeContainerDataTVector<int>& source) : OctreeContainerDataTVector<int>(source)
+primitive_leaf::primitive_leaf(const OctreeContainerPointIndices &source) : OctreeContainerPointIndices(source)
 {
 
 }

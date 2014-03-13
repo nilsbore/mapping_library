@@ -88,7 +88,7 @@ int cylinder_primitive::inliers(const MatrixXd& points, const MatrixXd& normals,
         pt = points.col(i);
         n = normals.col(i);
         rad = basis.transpose()*(pt - c);
-        if (fabs(rad.norm() - r) < 0.67*inlier_threshold && M_PI/2.0 - acos(fabs(a.dot(n))) < angle_threshold) {
+        if (fabs(rad.norm() - r) < inlier_threshold && M_PI/2.0 - acos(fabs(a.dot(n))) < angle_threshold) {
             pt2(0) = a.dot(pt - c);
             pt2(1) = r*atan2(rad(0), rad(1));
             if (pt2(0) < min2(0)) {
