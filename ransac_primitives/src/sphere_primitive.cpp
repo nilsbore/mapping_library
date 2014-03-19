@@ -285,3 +285,8 @@ double sphere_primitive::shape_data(VectorXd& data)
     data.segment<3>(0) = c;
     data(3) = r;
 }
+
+void sphere_primitive::shape_points(std::vector<Vector3d, aligned_allocator<Vector3d> >& points)
+{
+    points.clear();
+}

@@ -224,6 +224,8 @@ void cylinder_primitive::compute_shape_size(const MatrixXd& points)
         }
     }
 
+    double xc = a.dot(c);
+    c = c + ((minx + maxx)/2.0 - xc)*a; // drawing might not work so great after this
     h = fabs(maxx - minx);
 }
 
@@ -239,4 +241,9 @@ double cylinder_primitive::shape_data(VectorXd& data)
     data.segment<3>(3) = c;
     data(6) = r;
     data(7) = h;
+}
+
+void cylinder_primitive::shape_points(std::vector<Vector3d, aligned_allocator<Vector3d> >& points)
+{
+    points.clear();
 }

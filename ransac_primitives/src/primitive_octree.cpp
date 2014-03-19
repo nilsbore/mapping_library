@@ -44,11 +44,6 @@ void primitive_octree::remove_point(int ind)
         return;
     }
 
-    pcl::octree::OctreeContainerEmpty* test = dynamic_cast<pcl::octree::OctreeContainerEmpty*> (result);
-    if (test != NULL) {
-        std::cout << "The container was empty!" << std::endl;
-    }
-
     primitive_leaf_node* leafNode = dynamic_cast<primitive_leaf_node*> (result);
     if (leafNode != NULL) {
         if (!leafNode->getContainer().remove_if_equal(ind)) {
@@ -191,7 +186,6 @@ void primitive_octree::find_node_recursive(const pcl::octree::OctreeKey& key_arg
 
             if (depthMask_arg == 1 << depth) { // 2^depth
                 result_arg = childNode;
-                std::cout << "It happens in 1" << std::endl;
             }
             else {
                 find_node_recursive(key_arg, depthMask_arg / 2, childBranch, result_arg, depth);
@@ -201,10 +195,6 @@ void primitive_octree::find_node_recursive(const pcl::octree::OctreeKey& key_arg
         case pcl::octree::LEAF_NODE:
             // return existing leaf node
             result_arg = childNode;
-            std::cout << "It happens in 2" << std::endl;
-            break;
-        default:
-            std::cout << "Not branch or leaf node!" << std::endl;
             break;
         }
     }

@@ -28,6 +28,7 @@ public:
     void compute_shape_size(const Eigen::MatrixXd& points);
     double shape_size();
     double shape_data(Eigen::VectorXd& data);
+    void shape_points(std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d> >& points);
     shape get_shape();
     void draw(boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer);
     base_primitive* instantiate();

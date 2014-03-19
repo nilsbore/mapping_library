@@ -9,6 +9,8 @@
 #include "sphere_primitive.h"
 #include "cylinder_primitive.h"
 
+#include <pcl/features/normal_3d.h>
+
 int main(int argc, char** argv)
 {
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>());
@@ -44,7 +46,7 @@ int main(int argc, char** argv)
     params.inlier_threshold = 0.015;
     params.angle_threshold = 0.4;
     params.add_threshold = 0.001;
-    params.min_shape = 3000;
+    params.min_shape = 5000;
     params.inlier_min = params.min_shape;
     params.connectedness_res = 0.01;
     params.distance_threshold = 2.0;

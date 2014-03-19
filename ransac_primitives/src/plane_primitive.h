@@ -11,6 +11,9 @@ private:
     Eigen::Vector4d p;
     Eigen::Matrix<double, 3, 2> basis;
     Eigen::Vector2d sizes;
+    Eigen::Quaterniond quat;
+    Eigen::Vector3d c;
+    std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d> > convex_hull;
 public:
     bool construct(const Eigen::MatrixXd& points, const Eigen::MatrixXd& normals,
                    double inlier_threshold, double angle_threshold);
@@ -21,6 +24,7 @@ public:
     void direction_and_center(Eigen::Vector3d& direction, Eigen::Vector3d& center);
     double shape_size();
     double shape_data(Eigen::VectorXd& data);
+    void shape_points(std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d> >& points);
     void compute_shape_size(const Eigen::MatrixXd& points);
     shape get_shape();
     void draw(boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer);
