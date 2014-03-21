@@ -192,6 +192,48 @@ bool plane_primitive::construct(const MatrixXd& points, const MatrixXd& normals,
     std::cout << "U rows: " << evd.eigenvectors().rows() << ", cols: " << evd.eigenvectors().cols() << std::endl;
 }*/
 
+void plane_primitive::find_smallest_enclosing_box(Vector2d& cmin, Matrix2d& axes,
+                                                  Vector2d& lengths, std::vector<cv::Point>& pts)
+{
+    std::vector<Vector2d, aligned_allocator<Vector2d> > dpts;
+    dpts.resize(pts.size());
+    for (int i = 0; i < pts.size(); ++i) {
+        dpts[i] = Vector2d(double(pts[i].x), double(pts[i].y));
+    }
+    double areamin = INFINITY;
+    for (int i = 0; i < dpts.size(); ++i) { // all lines, find smallest area
+        Vector2d vec = dpts[(i+1)%int(dpts.size())] - dpts[i];
+        Vector2d ovec(-vec(1), vec(0));
+        vec.normalize();
+        ovec.normalize();
+        double widthmin = INFINITY;
+        double widthmax = -INFINITY;
+        double heightmax;
+        for (int j = 0; j < dpts.size(); ++j) { // find width and height
+            double proj = vec.dot(dpts[j] - dpts[i]);
+            double oproj = ovec.dot(dpts[j] - dpts[i]);
+            if (proj < widthmin) {
+                widthmin = proj;
+            }
+            if (proj > widthmax) {
+                widthmax = proj;
+            }
+            if (fabs(oproj) > fabs(heightmax)) {
+                heightmax = oproj;
+            }
+        }
+        double width = (widthmax - widthmin);
+        double area = fabs(heightmax)*width;
+        if (area < areamin) {
+            areamin = area;
+            axes.col(0) = vec;
+            axes.col(1) = ovec;
+            cmin = dpts[i] + 0.5*(widthmin*vec + widthmax*vec + heightmax*ovec);
+            lengths = Vector2d(width, heightmax);
+        }
+    }
+}
+
 void plane_primitive::compute_shape_size(const MatrixXd& points)
 {
     Vector2i pt;
@@ -249,11 +291,6 @@ void plane_primitive::compute_shape_size(const MatrixXd& points)
     // Find contours
     cv::findContours(binary, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
 
-    if (contours.size() > 1) {
-        std::cout << "Found more than one plane, exiting..." << std::endl;
-        //exit(0); // DEBUG
-    }
-
     int maxind = 0;
     int maxval = contours[0].size();
     for (int i = 1; i < contours.size(); ++i) {
@@ -281,6 +318,23 @@ void plane_primitive::compute_shape_size(const MatrixXd& points)
     cv::imshow("Hull demo", drawing);
     cv::waitKey(0);*/
 
+    Matrix2d axes;
+    Vector2d lengths;
+    Vector2d c2;
+    find_smallest_enclosing_box(c2, axes, lengths, hull[0]);
+    Vector3d c3 = 2.0*connectedness_res*basis*(minpt.cast<double>() + c2);
+    c = c3 - (p(3) + c3.dot(p.head<3>()))*p.head<3>();
+    sizes = 2.0*connectedness_res*lengths.array().abs();
+
+    Matrix3d R;
+    R.col(0) = p.head<3>();
+    R.col(0).normalize();
+    R.col(1) = basis*axes.col(0);
+    R.col(1).normalize();
+    R.col(2) = basis*axes.col(1);
+    R.col(2).normalize();
+    quat = Quaterniond(R);
+
     convex_hull.resize(hull[0].size());
     for (int i = 0; i < hull[0].size(); ++i) {
         Vector2i p2(hull[0][i].x, hull[0][i].y);
@@ -289,12 +343,12 @@ void plane_primitive::compute_shape_size(const MatrixXd& points)
     }
 
     // legacy
-    sizes(0) = 1.0;
-    sizes(1) = 1.0;
+    //sizes(0) = 1.0;
+    //sizes(1) = 1.0;
 
-    c.setZero();
+    //c.setZero();
 
-    quat.setIdentity();
+    //quat.setIdentity();
 }
 
 int plane_primitive::inliers(const MatrixXd& points, const MatrixXd& normals, const std::vector<int>& inds,

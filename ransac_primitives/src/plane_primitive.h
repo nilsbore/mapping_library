@@ -14,6 +14,9 @@ private:
     Eigen::Quaterniond quat;
     Eigen::Vector3d c;
     std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d> > convex_hull;
+protected:
+    void find_smallest_enclosing_box(Eigen::Vector2d& cmin, Eigen::Matrix2d& axes,
+                                     Eigen::Vector2d& lengths, std::vector<cv::Point>& pts);
 public:
     bool construct(const Eigen::MatrixXd& points, const Eigen::MatrixXd& normals,
                    double inlier_threshold, double angle_threshold);
