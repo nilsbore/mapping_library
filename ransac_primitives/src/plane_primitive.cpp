@@ -192,6 +192,7 @@ bool plane_primitive::construct(const MatrixXd& points, const MatrixXd& normals,
     std::cout << "U rows: " << evd.eigenvectors().rows() << ", cols: " << evd.eigenvectors().cols() << std::endl;
 }*/
 
+// compute the enclosing box from a set of points defining the convex hull
 void plane_primitive::find_smallest_enclosing_box(Vector2d& cmin, Matrix2d& axes,
                                                   Vector2d& lengths, std::vector<cv::Point>& pts)
 {

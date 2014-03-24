@@ -37,10 +37,12 @@ primitive_extractor::primitive_extractor(pcl::PointCloud<pcl::PointXYZRGB>::Ptr 
     level_scores.resize(tree_depth);
     level_scores.setZero();
 
+    std::cout << "Octree constructed, tree depth: " << tree_depth << std::endl;
+
     // estimate normals for all points
     estimate_normals();
 
-    std::cout << "Tree depth: " << tree_depth << std::endl;
+    std::cout << "Normals extracted..." << std::endl;
 
     mpoints.resize(3, cloud->size());
     mnormals.resize(3, cloud->size());
