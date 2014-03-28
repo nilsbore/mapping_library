@@ -72,8 +72,8 @@ bool cylinder_primitive::construct(const MatrixXd& points, const MatrixXd& norma
     return true;
 }
 
-int cylinder_primitive::inliers(const MatrixXd& points, const MatrixXd& normals, const std::vector<int>& inds,
-                                double inlier_threshold, double angle_threshold)
+void cylinder_primitive::compute_inliers(std::vector<int>& inliers, const MatrixXd& points, const MatrixXd& normals,
+                                         const std::vector<int>& inds, double inlier_threshold, double angle_threshold)
 {
     min2 << INFINITY, -r*M_PI;
     max2 << -INFINITY, r*M_PI;
@@ -102,8 +102,8 @@ int cylinder_primitive::inliers(const MatrixXd& points, const MatrixXd& normals,
         }
     }
 
-    if (temp.size() < min_inliers) {
-        return 0;
+    if (inlier_refinement == 1 && temp.size() < min_inliers) {
+        return;
     }
 
     max2(0) += connectedness_res/2.0;
@@ -134,12 +134,12 @@ int cylinder_primitive::inliers(const MatrixXd& points, const MatrixXd& normals,
     cv::Mat support = cv::Mat::zeros(width, height, CV_8UC1);
     cv::Mat binary2 = cv::Mat::zeros(height, width, CV_32SC1);
 
-    supporting_inds.reserve(temp.size());
+    inliers.reserve(temp.size());
     int largest = find_blobs(binary, true);
     counter = 0;
     for (const Vector2i& pp : plane_ptsi) {
         if (binary.at<int>(pp(1), pp(0)) == largest) {
-            supporting_inds.push_back(temp[counter]);
+            inliers.push_back(temp[counter]);
             support.at<unsigned char>(pp(0), pp(1)) = 1;
             binary2.at<int>(pp(1), pp(0)) = 65535;
         }
@@ -152,17 +152,14 @@ int cylinder_primitive::inliers(const MatrixXd& points, const MatrixXd& normals,
     cv::reduce(support, row_support, 0, CV_REDUCE_SUM, CV_32SC1);
     int nonzero = cv::countNonZero(row_support);
 
-    if (double(nonzero)/double(height) < 0.3) { // make this a parameter
-        supporting_inds.clear();
-        return 0;
+    if (inlier_refinement == 1 && double(nonzero)/double(height) < 0.3) { // make this a parameter
+        inliers.clear();
+        return;
     }
 
     //std::cout << "Non zero: " << nonzero << "/" << height << std::endl;
     //cv::imshow("support", binary2);
     //cv::waitKey(0);
-
-    std::sort(supporting_inds.begin(), supporting_inds.end());
-    return get_inliers();
 }
 
 base_primitive::shape cylinder_primitive::get_shape()
@@ -246,4 +243,9 @@ double cylinder_primitive::shape_data(VectorXd& data)
 void cylinder_primitive::shape_points(std::vector<Vector3d, aligned_allocator<Vector3d> >& points)
 {
     points.clear();
+}
+
+void cylinder_primitive::largest_connected_component(std::vector<int>& inliers, const MatrixXd& points)
+{
+
 }

@@ -20,7 +20,7 @@ int main(int argc, char** argv)
     //std::string filename = "/home/nbore/Data/table_scene_mug_stereo_textured.pcd";
     //std::string filename = "/home/nbore/catkin_ws/myclouds2/cloud33.pcd";
     //std::string filename = "/home/nbore/Data/Primitives/cloud28.pcd";
-    std::string filename = "/home/nbore/Data/Desk\ data/20131206/cloud2_downsampled.pcd";
+    std::string filename = "/home/nbore/Data/Desk\ data/20131206/cloud3_downsampled.pcd";
     //std::string filename = "/home/nbore/catkin_ws/farclouds2/cloud100.pcd";
     //std::string filename = "/home/nbore/catkin_ws/xtionclouds/cloud1620.pcd";
     //std::string filename = "/home/nbore/Data/SemanticMap/20131206/patrol_run_1/room_0/complete_cloud.pcd";
@@ -31,7 +31,7 @@ int main(int argc, char** argv)
         return 0;
     }
 
-    std::vector<base_primitive*> primitives = { new plane_primitive(), new sphere_primitive(), new cylinder_primitive() };
+    std::vector<base_primitive*> primitives = { new plane_primitive() };//, new sphere_primitive(), new cylinder_primitive() };
     primitive_params params;
     /*params.octree_res = 0.1;
     params.normal_neigbourhood = 0.1;
@@ -42,16 +42,17 @@ int main(int argc, char** argv)
     params.inlier_min = params.min_shape;
     params.connectedness_res = 0.01;
     params.distance_threshold = 1000;*/
-    /*params.octree_res = 0.04;
+    /*params.number_disjoint_subsets = 10;
+    params.octree_res = 0.04;
     params.normal_neigbourhood = 0.015;
     params.inlier_threshold = 0.015;
     params.angle_threshold = 0.4;
     params.add_threshold = 0.001;
-    params.min_shape = 5000;
+    params.min_shape = 3000;
     params.inlier_min = params.min_shape;
     params.connectedness_res = 0.01;
     params.distance_threshold = 2.0;*/
-    params.octree_res = 0.1;//0.04;
+    /*params.octree_res = 0.1;//0.04;
     params.normal_neigbourhood = 0.1;
     params.inlier_threshold = 0.03;
     params.angle_threshold = 0.4;
@@ -59,6 +60,16 @@ int main(int argc, char** argv)
     params.min_shape = 5000;
     params.inlier_min = params.min_shape;
     params.connectedness_res = 0.03;
+    params.distance_threshold = 4.0;*/
+    params.number_disjoint_subsets = 20;
+    params.octree_res = 0.5;
+    params.normal_neigbourhood = 0.04;
+    params.inlier_threshold = 0.04;
+    params.angle_threshold = 0.4;
+    params.add_threshold = 0.01;
+    params.min_shape = 2000;
+    params.inlier_min = params.min_shape;
+    params.connectedness_res = 0.01;
     params.distance_threshold = 4.0;
 
     primitive_visualizer viewer;

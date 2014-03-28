@@ -21,6 +21,7 @@ primitive_extractor::primitive_extractor(pcl::PointCloud<pcl::PointXYZRGB>::Ptr 
     octree(params.octree_res), primitives(primitives), params(params), vis(vis)
 {
     // setup parameters
+    base_primitive::number_disjoint_subsets = params.number_disjoint_subsets;
     base_primitive::min_inliers = params.inlier_min;
     base_primitive::connectedness_res = params.connectedness_res;
 
@@ -36,6 +37,7 @@ primitive_extractor::primitive_extractor(pcl::PointCloud<pcl::PointXYZRGB>::Ptr 
     tree_depth = octree.getTreeDepth() + 1;
     level_scores.resize(tree_depth);
     level_scores.setZero();
+    construct_octrees();
 
     std::cout << "Octree constructed, tree depth: " << tree_depth << std::endl;
 
@@ -52,6 +54,34 @@ primitive_extractor::primitive_extractor(pcl::PointCloud<pcl::PointXYZRGB>::Ptr 
         mpoints.col(i) = cloud->points[i].getVector3fMap().cast<double>();
         mnormals.col(i) = cloud_normals->points[i].getNormalVector3fMap().cast<double>();
         mnormals.col(i).normalize();
+    }
+}
+
+void primitive_extractor::construct_octrees()
+{
+    std::vector<int> inds;
+    inds.resize(cloud->size());
+    for (int i = 0; i < cloud->size(); ++i) {
+        inds[i] = i;
+    }
+    std::random_shuffle(inds.begin(), inds.end());
+
+    // setup the disjoint point sets
+    octrees.resize(params.number_disjoint_subsets, primitive_octree(params.octree_res)); // could probably just pass an int?
+    total_set_size.resize(params.number_disjoint_subsets);
+    int sum = 0;
+
+    int step = int(cloud->size())/params.number_disjoint_subsets; // assuming A >> B
+    for (int i = 0; i < params.number_disjoint_subsets; ++i) {
+        std::vector<int>::iterator start = inds.begin() + i*step;
+        std::vector<int>::iterator end = inds.begin() + (i+1)*step;
+        if (i == params.number_disjoint_subsets - 1) {
+            end = inds.end();
+        }
+        octrees[i].setInputCloud(cloud, primitive_octree::IndicesConstPtr(new std::vector<int>(start, end)));
+        octrees[i].addPointsFromInputCloud();
+        sum += octrees[i].size();
+        total_set_size[i] = sum;
     }
 }
 
@@ -100,7 +130,6 @@ void primitive_extractor::extract(std::vector<base_primitive*>& extracted)
 {
     number_extracted = 0; // set numbers extracted to zero again
     extracted.clear(); // extracted primitives
-    int counter; // to use where we need it
 
     // loop through all types and find maximum points required to construct shape
     int min_set = 1;
@@ -152,10 +181,9 @@ void primitive_extractor::extract(std::vector<base_primitive*>& extracted)
             base_primitive* c = p->instantiate();
             if (c->construct(points, normals, params.inlier_threshold, params.angle_threshold)) {
                 candidates.push_back(c);
-                inds.clear();
-                octree.find_potential_inliers(inds, c, params.inlier_threshold + 0.01);
-                c->inliers(mpoints, mnormals, inds, params.inlier_threshold, params.angle_threshold);
-                level_scores(level) += c->get_inliers();
+                c->refine_inliers(octrees, mpoints, mnormals, params.inlier_threshold, params.angle_threshold);
+                level_scores(level) += c->supporting_inds.size(); // TODO: this must be expected value instead
+                // should this get updated when intervals are refined? should be easy
             }
             else {
                 delete c;
@@ -169,19 +197,27 @@ void primitive_extractor::extract(std::vector<base_primitive*>& extracted)
             continue;
         }
 
-        // find the candidate with the most inliers
-        int best_val = -1;
-        int best_ind;
-        counter = 0;
-        for (base_primitive* p : candidates) {
-            if (p->get_inliers() > best_val) {
-                best_val = p->get_inliers();
-                best_ind = counter;
+        int rounds = 0;
+        std::vector<base_primitive*> best_candidates = candidates;
+        double best_val;
+        base_primitive* last_candidate = NULL;
+        //int repeat = 0;
+        do {
+            best_val = refine_inliers(best_candidates);
+            if (best_candidates.size() == 1 && best_candidates[0] != last_candidate) {
+                best_candidates[0]->final_inliers(octree, mpoints, mnormals, params.inlier_threshold, params.angle_threshold);
+                last_candidate = best_candidates[0];
+                best_candidates = candidates;
+                /*if (repeat > 0) {
+                    std::cout << "Repeat: " << repeat << std::endl;
+                }
+                ++repeat;*/
             }
-            ++counter;
+            ++rounds;
         }
+        while (best_candidates.size() > 1);
 
-        base_primitive* best_candidate = candidates[best_ind];
+        base_primitive* best_candidate = best_candidates[0];
         if (PRINTOUTS) {
             std::cout << "Candidates: " << candidates.size() << std::endl;
             std::cout << "Extracted: " << extracted.size() << std::endl;
@@ -189,12 +225,16 @@ void primitive_extractor::extract(std::vector<base_primitive*>& extracted)
             std::cout << "Best val:" << best_val << std::endl;
             std::cout << "Best cand prob: " << std::setprecision(10) << prob_candidate_not_found(double(best_val), candidates_evaluated,
                                                                         best_candidate->points_required()) << std::endl;
+            std::cout << "Rounds: " << rounds << std::endl;
         }
 
         // if no better candidate can be found with P > 1 - add_threshold -> add to extracted, remove overlapping from candidates
         if (prob_candidate_not_found(best_val, candidates_evaluated, min_set) < params.add_threshold) {
             // here we remove the points in the octree that are contained in best_candidate
             //add_new_primitive(best_candidate); // this removes the points from the octree before re-calculating candidates_evaluated
+            if (best_candidate->refinement_level() < params.number_disjoint_subsets) {
+                best_candidate->final_inliers(octree, mpoints, mnormals, params.inlier_threshold, params.angle_threshold);
+            }
             extracted.push_back(best_candidate);
             std::vector<base_primitive*> keep_candidates; // candidate to keep
             keep_candidates.reserve(candidates.size());
@@ -202,7 +242,7 @@ void primitive_extractor::extract(std::vector<base_primitive*>& extracted)
                 if (p == best_candidate) {
                     // do nothing
                 }
-                else if (p->are_contained(best_candidate->supporting_inds)) {
+                else if (p->are_contained(best_candidate->sorted_inliers())) {
                     // remove candidate
                     candidates_evaluated *= pow(1 - double(p->get_inliers())/double(octree.size()), 3.0);
                     delete p;
@@ -239,6 +279,79 @@ void primitive_extractor::extract(std::vector<base_primitive*>& extracted)
     }
 }
 
+base_primitive* primitive_extractor::max_inliers(double& maxmean, double& maxa, double& maxb,
+                                                 std::vector<base_primitive*>& primitives)
+{
+    base_primitive* best_candidate;
+    maxmean = -INFINITY;
+    double mean, a, b;
+    for (base_primitive* p : primitives) {
+        p->inliers_estimate(mean, a, b, octree.size(), total_set_size);
+        if (mean > maxmean) {
+            maxmean = mean;
+            maxa = a;
+            maxb = b;
+            best_candidate = p;
+        }
+    }
+    return best_candidate;
+}
+
+void primitive_extractor::overlapping_estimates(std::vector<base_primitive*>& primitives, base_primitive* best_candidate)
+{
+    double maxmean, maxa, maxb;
+    best_candidate->inliers_estimate(maxmean, maxa, maxb, octree.size(), total_set_size);
+    std::vector<base_primitive*> temp;
+    temp.push_back(best_candidate);
+    double mean, a, b;
+    for (base_primitive* p : primitives) {
+        if (p == best_candidate) {
+            continue;
+        }
+        p->inliers_estimate(mean, a, b, octree.size(), total_set_size);
+        // check if confidence intervals overlap
+        if ((a < maxa && maxa < b) || (a < maxb && maxb < b) ||
+                (maxa < a && a < maxb) || (maxa < b && b < maxb)) {
+            temp.push_back(p);
+        }
+    }
+    primitives.swap(temp);
+}
+
+double primitive_extractor::refine_inliers(std::vector<base_primitive*>& primitives)
+{
+    // find the candidate with the most expected inliers
+    double maxmean, maxa, maxb;
+    base_primitive* best_candidate = max_inliers(maxmean, maxa, maxb, primitives);
+    //best_candidate->final_inliers(octree, mpoints, mnormals, params.inlier_threshold, params.angle_threshold);
+    //best_candidate->inliers_estimate(maxmean, maxa, maxb, octree.size(), total_set_size);
+    int max_refinement = best_candidate->refinement_level();
+
+    // find all candidates with overlapping bounds, discard the rest
+    overlapping_estimates(primitives, best_candidate);
+
+    /*if (primitives.size() == 1) {
+        best_candidate->final_inliers(octree, mpoints, mnormals, params.inlier_threshold, params.angle_threshold);
+        primitives = candidates;
+        best_candidate = max_inliers(maxmean, maxa, maxb, primitives);
+        overlapping_estimates(primitives, maxa, maxb);
+        int max_refinement = best_candidate->refinement_level();
+    }*/
+
+    // refine if there is more than one found
+    // TODO: do this in a smarter way
+    if (primitives.size() == 1) {
+        return maxmean;
+    }
+    for (base_primitive* p : primitives) {
+        if (p->refinement_level() <= max_refinement) {
+            p->refine_inliers(octrees, mpoints, mnormals, params.inlier_threshold, params.angle_threshold);
+        }
+    }
+
+    return maxmean;
+}
+
 void primitive_extractor::clear_primitives(std::vector<base_primitive*>& ps)
 {
     for (base_primitive* p : ps) {
@@ -260,6 +373,15 @@ void primitive_extractor::add_new_primitive(base_primitive* primitive)
 void primitive_extractor::remove_points_from_cloud(base_primitive* p)
 {
     octree.remove_points(p->supporting_inds); // remove points in octree that are part of shape
+    int sum = 0;
+    //std::cout << "Octree sizes: ";
+    for (int i = 0; i < params.number_disjoint_subsets; ++i) {
+        //std::cout << octrees[i].size() << " ";
+        octrees[i].remove_points(p->supporting_inds);
+        sum += octrees[i].size();
+        total_set_size[i] = sum;
+    }
+    std::cout << std::endl;
 
     if (vis != NULL) {
         vis->lock();
@@ -272,38 +394,6 @@ void primitive_extractor::remove_points_from_cloud(base_primitive* p)
     p->blue = colormap[r][2];
     ++number_extracted;
 
-    /*int r = rand() % 6;
-    if (r == 0) {
-        p->green = 255;
-    }
-    else if (r == 1) {
-        p->red = 255;
-        p->blue = 255;
-    }
-    else if (r == 2) {
-        p->green = 255;
-        p->blue = 255;
-    }
-    else if (r == 3) {
-        p->red = 255;
-    }
-    else {
-        p->blue = 255;
-    }*/
-
-    /*switch (p->get_shape()) {
-    case base_primitive::PLANE:
-        p->red = 255;
-        break;
-    case base_primitive::SPHERE:
-        p->green = 255;
-        break;
-    case base_primitive::CYLINDER:
-        p->blue = 255;
-        break;
-    default:
-        break;
-    }*/
     for (const int& i : p->supporting_inds) {
         cloud->points[i].r = p->red;
         cloud->points[i].g = p->green;
@@ -344,17 +434,6 @@ int primitive_extractor::sample_level(int iteration)
 void primitive_extractor::get_points_at_level(std::vector<int>& inds, point& p, int level)
 {
     octree.find_points_at_depth(inds, p, level);
-}
-
-void primitive_extractor::generate_random_subsets(std::vector<std::vector<int> >& subsets, int n)
-{
-    subsets.resize(n);
-    for (int i = 0; i < n; ++i) {
-        subsets[i].reserve(cloud->size() / (n - 1)); // to be sure there is enough space
-    }
-    for (int i = 0; i < cloud->size(); ++i) {
-        subsets[rand() % n].push_back(i);
-    }
 }
 
 // candidates_evaluated needs to be modified after points have been deleted, candidates added

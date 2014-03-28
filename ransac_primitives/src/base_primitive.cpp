@@ -2,12 +2,92 @@
 
 #include <algorithm>
 #include <opencv2/highgui/highgui.hpp> // DEBUG
+#include "primitive_octree.h"
 
 using namespace Eigen;
 
 int base_primitive::min_inliers = 100;
 double base_primitive::margin = 0.03;
 double base_primitive::connectedness_res = 0.01;
+int base_primitive::number_disjoint_subsets = 20;
+
+void base_primitive::inliers_estimate(double& mean, double& a, double& b, int set_size, std::vector<int>& total_set_size)
+{
+    double N = -2.0 - double(total_set_size[inlier_refinement-1]);
+    double x = -2.0 - double(set_size);
+    double n = -1.0 - double(supporting_inds.size());
+    mean = -1.0 - x*n/N;
+    double dev = 1.0/N*sqrt(x*n*(N-x)*(N+n)/(N-1));
+    /*std::cout << "inlier_refinement: " << inlier_refinement << std::endl;
+    std::cout << "x: " << x << std::endl;
+    std::cout << "N:" << N << std::endl;
+    std::cout << "n: " << n << std::endl;
+    std::cout << "Dev: " << dev << std::endl;*/
+    a = mean + dev;
+    b = mean - dev;
+}
+
+void base_primitive::final_inliers(primitive_octree& octree, MatrixXd& points, MatrixXd& normals,
+                                   double inlier_threshold, double angle_threshold)
+{
+    if (inlier_refinement == number_disjoint_subsets) {
+        return;
+    }
+    inlier_refinement = number_disjoint_subsets;
+    supporting_inds.clear();
+    std::vector<int> inds;
+    octree.find_potential_inliers(inds, this, 0.01);
+    compute_inliers(conforming_inds, points, normals, inds, inlier_threshold, angle_threshold);
+    //compute_inliers(supporting_inds, points, normals, inds, inlier_threshold, angle_threshold);
+    largest_connected_component(supporting_inds, points);
+    std::sort(supporting_inds.begin(), supporting_inds.end());
+    sorted = true;
+}
+
+void base_primitive::refine_inliers(std::vector<primitive_octree>& octrees, MatrixXd& points,
+                                    MatrixXd& normals, double inlier_threshold, double angle_threshold)
+{
+    if (inlier_refinement == number_disjoint_subsets) {
+        return;
+    }
+    ++inlier_refinement; // check if larger than disjoint sets?
+    std::vector<int> inds;
+    int n = inlier_refinement - 1;
+    octrees[n].find_potential_inliers(inds, this, 0.01);
+    std::vector<int> inliers;
+    compute_inliers(inliers, points, normals, inds, inlier_threshold, angle_threshold);
+    /*if (inlier_refinement == 1 && inliers.size() < 10) {
+        return;
+    }*/
+    //std::sort(inliers.begin(), inliers.end()); // maybe we need to sort the whole of supporting inds? why did I do this?
+    // oh, yeah, to get the finding of mutual points in primitives faster, so not here
+    //supporting_inds.insert(supporting_inds.end(), inliers.begin(), inliers.end());
+    //sorted = false;
+    conforming_inds.insert(conforming_inds.end(), inliers.begin(), inliers.end());
+    if (conforming_inds.size() < min_inliers || inlier_refinement == 1) {
+        supporting_inds = conforming_inds;
+    }
+    else {
+        inliers.clear();
+        largest_connected_component(inliers, points);
+        supporting_inds.swap(inliers);
+    }
+    sorted = false;
+}
+
+std::vector<int>& base_primitive::sorted_inliers()
+{
+    if (!sorted) {
+        std::sort(supporting_inds.begin(), supporting_inds.end());
+        sorted = true;
+    }
+    return supporting_inds;
+}
+
+int base_primitive::refinement_level() const
+{
+    return inlier_refinement;
+}
 
 void base_primitive::compute_shape_size(const MatrixXd& points)
 {
@@ -16,6 +96,10 @@ void base_primitive::compute_shape_size(const MatrixXd& points)
 
 bool base_primitive::are_contained(const std::vector<int>& other_inds)
 {
+    if (!sorted) {
+        std::sort(supporting_inds.begin(), supporting_inds.end());
+        sorted = true;
+    }
     // check if the primitives share any inliers
     int counter1 = 0;
     int counter2 = 0;
@@ -142,6 +226,11 @@ void base_primitive::circle_to_grid(Vector2d& rtn, const Vector2d onDisk)
     }
     rtn(0) = 0.5*(a + 1.0);
     rtn(1) = 0.5*(b + 1.0);
+}
+
+double base_primitive::current_connectedness_res()
+{
+    return double(number_disjoint_subsets)/double(inlier_refinement)*connectedness_res;
 }
 
 void base_primitive::write_indices_to_stream(std::ostream& o)

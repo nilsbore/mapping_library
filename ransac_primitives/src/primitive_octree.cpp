@@ -6,10 +6,16 @@ primitive_octree::primitive_octree(double resolution) :
 
 }
 
-void primitive_octree::setInputCloud(const PointCloudConstPtr &cloud_arg, const IndicesConstPtr &indices_arg)
+void primitive_octree::setInputCloud(const PointCloudConstPtr &cloud_arg, const IndicesConstPtr& indices_arg)
 {
+    //std::sort(indices_arg->begin(), indices_arg->end());
     super::setInputCloud(cloud_arg, indices_arg);
-    points_left = input_->size();
+    if (!indices_arg) {
+        points_left = input_->size();
+    }
+    else {
+        points_left = indices_->size();
+    }
 }
 
 primitive_octree::~primitive_octree()
@@ -24,13 +30,35 @@ int primitive_octree::size()
 
 void primitive_octree::remove_points(const std::vector<int>& inds)
 {
+    /*std::sort(inds.begin(), inds.end());
+    std::vector<int> remove_inds;
+    remove_inds.reserve(inds.size());
+    std::vector<int> new_indices;
+    new_indices.reserve(indices_.size());
+
+    // check if the primitives share any inliers
+    int counter1 = 0;
+    int counter2 = 0;
+    while (counter1 < inds.size() && counter2 < indices_.size()) {
+        if (inds[counter1] == indices_[counter2]) {
+            remove_inds.push_back(inds[counter1]);
+        }
+        if (supporting_inds[counter1] < other_inds[counter2]) {
+            ++counter1;
+        }
+        else {
+            ++counter2;
+        }
+    }*/
+
     for (const int& ind : inds) {
-        remove_point(ind);
-        --points_left;
+        if (remove_point(ind)) {
+            --points_left; // point successfully removed
+        }
     }
 }
 
-void primitive_octree::remove_point(int ind)
+bool primitive_octree::remove_point(int ind)
 {
     pcl::octree::OctreeKey key;
     PointT point = input_->points[ind];
@@ -41,20 +69,24 @@ void primitive_octree::remove_point(int ind)
     pcl::octree::OctreeNode* result = NULL;
     find_node_recursive(key, depth_mask_, root_node_, result, 0);
     if (result == NULL) {
-        return;
+        return false;
     }
 
     primitive_leaf_node* leafNode = dynamic_cast<primitive_leaf_node*> (result);
     if (leafNode != NULL) {
-        if (!leafNode->getContainer().remove_if_equal(ind)) {
-            std::cout << "Couldn't remove point!" << std::endl;
-            exit(0); // FIXME: this happened once in the big dataset for some reason
+        if (leafNode->getContainer().remove_if_equal(ind)) {
+            return true;
         }
+        //else {
+            //std::cout << "Couldn't remove point!" << std::endl;
+            //exit(0); // This should happen now since we don't know if a point is in an octree
+        //}
     }
-    else {
-        std::cout << "Leaf is null!" << std::endl;
-        exit(0);
-    }
+    //else {
+        //std::cout << "Leaf is null!" << std::endl;
+        //exit(0);
+    //}
+    return false;
 }
 
 void primitive_octree::find_points_at_depth(std::vector<DataT>& inds, const PointT& point, int depth)
@@ -102,7 +134,6 @@ void primitive_octree::serialize_inliers(const BranchNode* branch_arg, pcl::octr
                                          unsigned int treeDepth_arg, std::vector<DataT>* dataVector_arg,
                                          base_primitive* primitive, double margin) const
 {
-
     // child iterator
     unsigned char childIdx;
     Eigen::Vector3f min_pt;

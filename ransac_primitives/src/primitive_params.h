@@ -3,6 +3,7 @@
 
 struct primitive_params
 {
+    int number_disjoint_subsets;
     double octree_res;
     double normal_neigbourhood;
     double inlier_threshold;
@@ -14,6 +15,7 @@ struct primitive_params
     double distance_threshold;
     primitive_params(const primitive_params& other)
     {
+        number_disjoint_subsets = other.number_disjoint_subsets;
         octree_res = other.octree_res;
         normal_neigbourhood = other.normal_neigbourhood;
         inlier_threshold = other.inlier_threshold;
@@ -27,6 +29,7 @@ struct primitive_params
 
     primitive_params()
     {
+        number_disjoint_subsets = 20;
         octree_res = 0.2;
         normal_neigbourhood = 0.02;
         inlier_threshold = 0.01;

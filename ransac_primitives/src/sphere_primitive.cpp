@@ -108,8 +108,8 @@ bool sphere_primitive::construct(const MatrixXd& points, const MatrixXd& normals
     return true;
 }
 
-int sphere_primitive::inliers(const MatrixXd& points, const MatrixXd& normals, const std::vector<int>& inds,
-                             double inlier_threshold, double angle_threshold)
+void sphere_primitive::compute_inliers(std::vector<int>& inliers, const MatrixXd& points, const MatrixXd& normals,
+                                       const std::vector<int>& inds, double inlier_threshold, double angle_threshold)
 {
     Vector2d min2;
     min2 << -r*M_PI/2.0, -r*M_PI/2.0;
@@ -138,8 +138,8 @@ int sphere_primitive::inliers(const MatrixXd& points, const MatrixXd& normals, c
         }
     }
 
-    if (temp.size() < min_inliers) {
-        return 0;
+    if (inlier_refinement == 1 && temp.size() < min_inliers) {
+        return;
     }
 
     Vector2d size2 = max2 - min2;
@@ -202,12 +202,12 @@ int sphere_primitive::inliers(const MatrixXd& points, const MatrixXd& normals, c
     //cv::waitKey(0);
     cv::Mat binary2 = cv::Mat::zeros(2*height, width, CV_32SC1);
 
-    supporting_inds.reserve(temp.size());
+    inliers.reserve(temp.size());
     int largest = find_blobs(binary, true, true);
     counter = 0;
     for (const Vector2i& pp : sphere_ptsi) {
         if (binary.at<int>(pp(1), pp(0)) == largest) {
-            supporting_inds.push_back(temp[counter]);
+            inliers.push_back(temp[counter]);
             binary2.at<int>(pp(1), pp(0)) = 65535;
         }
         ++counter;
@@ -215,9 +215,6 @@ int sphere_primitive::inliers(const MatrixXd& points, const MatrixXd& normals, c
 
     //cv::imshow("Binary2", binary2);
     //cv::waitKey(0);
-
-    std::sort(supporting_inds.begin(), supporting_inds.end());
-    return get_inliers();
 }
 
 base_primitive::shape sphere_primitive::get_shape()
@@ -289,4 +286,9 @@ double sphere_primitive::shape_data(VectorXd& data)
 void sphere_primitive::shape_points(std::vector<Vector3d, aligned_allocator<Vector3d> >& points)
 {
     points.clear();
+}
+
+void sphere_primitive::largest_connected_component(std::vector<int>& inliers, const MatrixXd& points)
+{
+
 }

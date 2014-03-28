@@ -1,6 +1,6 @@
 project(ransac_primitives)
 
-set(CMAKE_CXX_FLAGS "-O4 -g -Wall -fPIC -std=c++0x -DNDEBUG")
+set(CMAKE_CXX_FLAGS "-O4 -g -Wall -fPIC -std=c++0x")
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
@@ -26,9 +26,9 @@ add_library(primitive_leaf src/primitive_leaf.cpp)
 add_library(primitive_octree src/primitive_octree.cpp)
 add_executable(test_primitives src/test_primitives.cpp)
 add_executable(test_find_point src/test_find_point.cpp)
-add_executable(test_sphere_components src/test_sphere_components.cpp)
+#add_executable(test_sphere_components src/test_sphere_components.cpp)
 
-target_link_libraries(base_primitive opencv_core opencv_imgproc opencv_highgui ${PCL_LIBRARIES})
+target_link_libraries(base_primitive primitive_octree opencv_core opencv_imgproc opencv_highgui ${PCL_LIBRARIES})
 target_link_libraries(plane_primitive base_primitive ${PCL_LIBRARIES})
 target_link_libraries(sphere_primitive base_primitive ${PCL_LIBRARIES})
 target_link_libraries(cylinder_primitive base_primitive ${PCL_LIBRARIES})
@@ -38,4 +38,4 @@ target_link_libraries(primitive_extractor base_primitive primitive_visualizer pr
 target_link_libraries(primitive_visualizer ${PCL_LIBRARIES})
 target_link_libraries(test_primitives primitive_extractor plane_primitive primitive_visualizer ${PCL_LIBRARIES})
 target_link_libraries(test_find_point primitive_extractor plane_primitive sphere_primitive cylinder_primitive primitive_visualizer ${PCL_LIBRARIES})
-target_link_libraries(test_sphere_components sphere_primitive)
+#target_link_libraries(test_sphere_components sphere_primitive)
