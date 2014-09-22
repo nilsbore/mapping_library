@@ -223,6 +223,7 @@ private:
 	unsigned int minsup;
 	unsigned int maxpat_min;	// lower bound on node count
 	unsigned int maxpat_max;	// upper bound on node count
+	int edges_missing_max;
 	bool where;
 	bool enc;
 	bool directed;

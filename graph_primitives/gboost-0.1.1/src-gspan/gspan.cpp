@@ -32,6 +32,7 @@ namespace GSPAN {
 gSpan::gSpan (void)
 {
 	boost = false;
+	edges_missing_max = 0;
 }
 
 void gSpan::mexAppendGraph (Graph* g, unsigned int ID, double par,
@@ -292,9 +293,16 @@ void gSpan::report_boosting (Projected &projected, unsigned int sup,
 		return;
 	if (maxpat_min > 0 && DFS_CODE.nodeCount () < maxpat_min)
 		return;
-
+		
 	Graph g(directed);
 	DFS_CODE.toGraph (g);
+	// TRY
+	unsigned int min_edges = DFS_CODE.nodeCount ();
+    min_edges = min_edges*(min_edges-1)/2 - edges_missing_max;
+	if (g.edge_size() < min_edges) {
+	    return;
+	}
+	// TRY
 
 	// insert individual counts
 	std::map<unsigned int, unsigned int> GYcounts;
@@ -366,6 +374,13 @@ void gSpan::report_single (Graph &g, std::map<unsigned int, unsigned int>& ncoun
 		return;
 	if (maxpat_min > 0 && g.size () < maxpat_min)
 		return;
+    // TRY
+	unsigned int min_edges = g.size ();
+    min_edges = min_edges*(min_edges-1)/2 - edges_missing_max;
+    if (g.edge_size() < min_edges) {
+        return;
+    }
+    // TRY
 
 	if (mex) {
 		mexAppendGraph (&g, ID, sup, ncount);
@@ -393,7 +408,7 @@ void gSpan::report (Projected &projected, unsigned int sup)
 		return;
 	if (maxpat_min > 0 && DFS_CODE.nodeCount () < maxpat_min)
 		return;
-
+    
 	/* Output to matlab.
 	 */
 	if (mex) {
@@ -405,6 +420,13 @@ void gSpan::report (Projected &projected, unsigned int sup)
 		
 		Graph g(directed);
 		DFS_CODE.toGraph (g);
+		// TRY
+		unsigned int min_edges = DFS_CODE.nodeCount ();
+        min_edges = min_edges*(min_edges-1)/2 - edges_missing_max;
+	    if (g.edge_size() < min_edges) {
+	        return;
+	    }
+	    // TRY
 		
 		//edge_vector.resize(projected.size());
 		indices.resize(projected.size());
@@ -496,6 +518,7 @@ void gSpan::project (Projected &projected)
 	 */
 	unsigned int sup = support (projected);
 	if (sup < minsup)
+	//if (projected.size() < minsup)
 		return;
 
 	/* The minimal DFS code check is more expensive than the support check,
@@ -729,6 +752,8 @@ void gSpan::run_graphs (const mxArray* graphs, int nlhs, mxArray* plhs[],
 	unsigned int gcount = mxGetN (graphs);
 	read (graphs);
 	run_intern ();
+	
+	mexPrintf("Algorithm finished, putting results into the right places...\n");
 
 	/* For the boosting mode, we only now convert the collected graphs to mex
 	 * structures.

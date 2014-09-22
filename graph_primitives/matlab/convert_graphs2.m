@@ -1,4 +1,4 @@
-function convert_graphs(graph_folder, filename)
+function convert_graphs2(graph_folder, filename)
 
 global anglehist
 
@@ -9,8 +9,8 @@ G = {};
 listing = dir([graph_folder 'graph*.dot']);
 l = length(listing);
 for i = 1:l
-    di = [graph_folder listing(i).name]
-    G{i} = dot2mat(di);
+    di = [graph_folder listing(i).name];
+    G{i} = dot2mat2(di);
 end
 
 for i = 1:l

@@ -1,4 +1,4 @@
-function status = display_graph(pcdfile, index, screenshot, indices, nodes)
+function status = display_graph2(pcdfile, index, screenshot, indices, nodes)
 
 viewer = 'optirun ../bin/display_graph';
 
