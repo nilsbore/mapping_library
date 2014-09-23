@@ -59,7 +59,7 @@ int main(int argc, char** argv)
         std::cout << "Primitive indices and orderings must be the same size!" << std::endl;
     }
     
-    //int colormap[][3] = {{255, 0, 0}, {0, 255, 0}, {0, 0, 255}, {255, 0, 255}, {255, 255, 0}, {64, 224, 208}};
+    int colormap[][3] = {{0, 255, 0}, {255, 255, 0}, {0, 0, 255}, {255, 0, 0}, {255, 0, 255}, {64, 224, 208}};
     /*int colormap[][3] = {{141,211,199},
                          {255,255,179},
                          {190,186,218},
@@ -72,7 +72,7 @@ int main(int argc, char** argv)
                          {188,128,189},
                          {204,235,197},
                          {255,237,111}};*/
-    int colormap[][3] = {{166,206,227},
+    /*int colormap[][3] = {{166,206,227},
                          {31,120,180},
                          {178,223,138},
                          {51,160,44},
@@ -83,7 +83,7 @@ int main(int argc, char** argv)
                          {202,178,214},
                          {106,61,154},
                          {255,255,153},
-                         {177,89,40}};
+                         {177,89,40}};*/
                          
     for (int j = 0; j < cloud->points.size(); ++j) {
         cloud->points[j].r = 80;
@@ -127,29 +127,40 @@ int main(int argc, char** argv)
         int index;
         int o;
         std::cout << "Display nodes: " << order.size() << std::endl;
+        std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f> > points;
         for (int i = 0; i < order.size(); ++i) {
             o = order[i] - 1;
             std::cout << order[i] << std::endl;
             if (o == -1) {
                continue;
             }
+            points.push_back(Eigen::Vector3f(0, 0, 0));
+            float number_pointsi = 0;
             for (int j = 0; j < res[i].size(); ++j) {
                 index = res[i][j];
                 cloud->points[index].r = colormap[o%12][0];
                 cloud->points[index].g = colormap[o%12][1];
                 cloud->points[index].b = colormap[o%12][2];
                 point.getVector3fMap() += cloud->points[index].getVector3fMap();
+                points.back() += cloud->points[index].getVector3fMap();
                 number_points += 1.0f;
+                number_pointsi += 1.0f;
             }
+            points.back() *= 1.0f/number_pointsi;
         }
+        std::sort(points.begin(), points.end(), [](const Eigen::Vector3f& first, const Eigen::Vector3f& second) { return first(0) < second(0); });
+        point.x = points[int(points.size()/2)](0);
+        std::sort(points.begin(), points.end(), [](const Eigen::Vector3f& first, const Eigen::Vector3f& second) { return first(1) < second(1); });
+        point.y = points[int(points.size()/2)](1);
+        point.z = 3.0f;
         pcl::PointCloud<pcl::PointXYZRGB>::Ptr single_cloud(new pcl::PointCloud<pcl::PointXYZRGB>());
-        point.getVector3fMap() *= 1.0f/number_points;
-        point.getVector3fMap()(2) += 2.0f;
+        //point.getVector3fMap() *= 1.0f/number_points;
+        //point.getVector3fMap()(2) += 2.0f;
         single_cloud->points.push_back(point);
-        pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> single_rgb(single_cloud);
+        /*pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> single_rgb(single_cloud);
         viewer.addPointCloud<pcl::PointXYZRGB>(single_cloud, single_rgb, std::string("point") + std::to_string(m));
         viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE,
-                                                 30, std::string("point") + std::to_string(m));
+                                                 30, std::string("point") + std::to_string(m));*/
     }
 
     pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(cloud);

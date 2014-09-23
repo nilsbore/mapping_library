@@ -6,8 +6,8 @@
 data_folder = '/home/nbore/Data/primitiveall/';
 
 % path to folder to save the dot and index files
-%graph_folder = '/home/nbore/.ros/final_map3/graphs3/';
-graph_folder = '/home/nbore/.ros/final_map3/graphs4/';
+%graph_folder = '/home/nbore/.ros/final_map3/graphs65/';
+graph_folder = '/home/nbore/.ros/final_map3/graphs34/';
 
 % add the gspan command
 addpath '../gboost-0.1.1/bin'; 
@@ -42,7 +42,7 @@ setenv('LD_LIBRARY_PATH', ld_path);
 
 %% Convert the dot files from test_graph to a matlab graph format
 % store in graph_folder
-convert_graphs2(graph_folder, 'matgraphs1.mat');
+convert_graphs2(graph_folder, 'matgraphs2.mat');
 
 %% Read the positions and store them in a matlab format
 % store in graph_folder
@@ -50,7 +50,7 @@ convert_positions(data_folder, graph_folder, 'positions.mat');
 
 %% Load the converted graph
 
-graphfile = [graph_folder 'matgraphs1.mat'];
+graphfile = [graph_folder 'matgraphs2.mat'];
 load(graphfile)
 
 %% Change the floor nodes to have its own label instead of plane
@@ -77,7 +77,8 @@ N = test_cliques(G, min_nodes);
 %% Run the basic gspan analysis
 
 min_nodes = 5;%6;
-minsup = 17;
+%minsup = 17; % for 6x6
+minsup = 30; % for 3x3
 % 26 for five?
 [subg, count, GY, indices, node_indices] = gspan(G, minsup, [min_nodes min_nodes+1]); %15
 n = length(subg);
@@ -88,12 +89,12 @@ n = length(subg);
 
 %% Save the temp subgraphs
 
-freqfile = [graph_folder 'temp1.mat'];
+freqfile = [graph_folder 'temp2.mat'];
 save(freqfile, 'subg', 'count', 'GY', 'indices', 'node_indices');
 
 %% Load the temp subgraphs
 
-freqfile = [graph_folder 'temp1.mat'];
+freqfile = [graph_folder 'temp2.mat'];
 load(freqfile)
 n = length(subg);
 
@@ -152,7 +153,7 @@ n = length(subg);
 %% Filter base on number of edges
 
 %min_edges = 15;
-min_edges = 8;
+min_edges = 5;
 assign_index = 1;
 lensubg = length(subg);
 
@@ -192,12 +193,12 @@ n = length(subg);
 
 %% Save the frequent subgraphs
 
-freqfile = [graph_folder 'matsubgraphs.mat'];
+freqfile = [graph_folder 'matsubgraphs2.mat'];
 save(freqfile, 'subg', 'count', 'GY', 'indices', 'node_indices');
 
 %% Load the frequent subgraphs
 
-freqfile = [graph_folder 'matsubgraphs.mat'];
+freqfile = [graph_folder 'matsubgraphs2.mat'];
 load(freqfile)
 n = length(subg);
 
@@ -320,7 +321,7 @@ end
 
 %% Show all the partitioned clouds of one group in the big map
 
-for ind = 3:length(subg)
+for ind = 1%1:length(subg)
 %ind = 14;
 screenshot_folder = [graph_folder sprintf('clustered%.6d/', ind)];
 mkdir(screenshot_folder)

@@ -17,7 +17,7 @@ pat2 = '(?<from>\d+)--(?<to>\d+).+\[label="(?<angle>\d*\.?\d*?)"\]?.+\[shapedist
 p = primitives;
 planeind = cellfind(p, 'Plane');
 
-alpha = 0.5;
+alpha = 0.52;
 
 while true
    tline = fgetl(fid);
@@ -87,6 +87,8 @@ while true
                    fromd = G.nodedata(from, 4);
                    ton = G.nodedata(to, 1:3)'; % to plane normal
                    tod = G.nodedata(to, 4);
+                   fromc = G.nodedata(from, 7:9)';
+                   toc = G.nodedata(to, 7:9)';
 %                    if fromd < 0 % 0*n_from + d_from < 0 (pointing away from camera)
 %                        fromn = -fromn;
 %                        fromd = -fromd;
@@ -95,17 +97,34 @@ while true
 %                        ton = -ton;
 %                        tod = -tod;
 %                    end
-                   G.edges = [G.edges; uint32(zeros(1, 3))];
-                   G.edges(end, 1) = from;
-                   G.edges(end, 2) = to;
-                   if fromn'*ton < 0 % facing each other
-                       G.edges(end, 3) = 2;
-                   elseif false % pointing way from each other
-                       G.edges(end, 3) = 5;
-                   else % parallell
-                       if abs(-tod/ton(3)+fromd/fromn(3)) < 0.2 % distance of planes
+                   if fromn'*ton < 0 % different directions
+                       if all(fromc == 0) || all(toc) == 0 % floor always facing
+                           G.edges = [G.edges; uint32(zeros(1, 3))];
+                           G.edges(end, 1) = from;
+                           G.edges(end, 2) = to;
+                           G.edges(end, 3) = 2;
+                       elseif (ton'-fromn')*(fromc - toc) > 0 % facing each other
+                           G.edges = [G.edges; uint32(zeros(1, 3))];
+                           G.edges(end, 1) = from;
+                           G.edges(end, 2) = to;
+                           G.edges(end, 3) = 2;
+                       else % pointing away from each other
+                           continue
+                           %G.edges = [G.edges; uint32(zeros(1, 3))];
+                           %G.edges(end, 1) = from;
+                           %G.edges(end, 2) = to;
+                           %G.edges(end, 3) = 5;
+                       end
+                   else % same direction
+                       if abs(-tod/ton(3)+fromd/fromn(3)) < 0.3 % distance of planes
+                           G.edges = [G.edges; uint32(zeros(1, 3))];
+                           G.edges(end, 1) = from;
+                           G.edges(end, 2) = to;
                            G.edges(end, 3) = 3;
                        else
+                           G.edges = [G.edges; uint32(zeros(1, 3))];
+                           G.edges(end, 1) = from;
+                           G.edges(end, 2) = to;
                            G.edges(end, 3) = 4;
                        end
                    end
